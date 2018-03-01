@@ -1,7 +1,6 @@
 pragma solidity 0.4.19;
 
-import { BasicToken } from "zeppelin-solidity/contracts/token/ERC20/BasicToken.sol";
-import { Ownable } from "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import { MintableToken } from "zeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
 
 
 /**
@@ -9,7 +8,7 @@ import { Ownable } from "zeppelin-solidity/contracts/ownership/Ownable.sol";
  * @author Jakub Stefanski (https://github.com/jstefanski)
  * @author Wojciech Harzowski (https://github.com/harzo)
  */
-contract TestToken is BasicToken, Ownable {
+contract TestToken is MintableToken {
 
     string public name;
 
@@ -22,7 +21,8 @@ contract TestToken is BasicToken, Ownable {
 
     function TestToken(
         string _name,
-        string _symbol
+        string _symbol,
+        uint256 _totalSupply
     )
         public
         onlyNotEmpty(_name)
@@ -30,5 +30,6 @@ contract TestToken is BasicToken, Ownable {
     {
         name = _name;
         symbol = _symbol;
+        totalSupply_ = _totalSupply;
     }
 }
