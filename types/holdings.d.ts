@@ -8,28 +8,45 @@ declare module 'holdings' {
     TransactionResult,
     TruffleArtifacts
   } from 'truffle';
-  import {AnyNumber} from 'web3';
+  import { AnyNumber } from 'web3';
 
   namespace holdings {
     interface Migrations extends ContractBase {
-      setCompleted(completed: number,
-                   options?: TransactionOptions): Promise<TransactionResult>;
+      setCompleted(
+        completed: number,
+        options?: TransactionOptions
+      ): Promise<TransactionResult>;
 
-      upgrade(address: Address,
-              options?: TransactionOptions): Promise<TransactionResult>;
+      upgrade(
+        address: Address,
+        options?: TransactionOptions
+      ): Promise<TransactionResult>;
+    }
+
+    interface EmployeeRegisteredEvent {
+      addr: Address;
+      joinTimestamp: BigNumber;
+    }
+
+    interface EmployeeFiredEvent {
+      addr: Address;
     }
 
     interface Holder extends ContractBase {
-      registerEmployee(addr: Address,
-                       joinTimestamp: AnyNumber,
-                       options?: TransactionOptions
+      registerEmployee(
+        addr: Address,
+        joinTimestamp: AnyNumber,
+        options?: TransactionOptions
       ): Promise<TransactionResult>;
 
-      getEmployees(): Promise<[Address[], BigNumber[]]>;
-    }
+      fireEmployee(
+        addr: Address,
+        options?: TransactionOptions
+      ): Promise<TransactionResult>;
 
-    interface ExampleAttributeChangedEvent {
-      newValue: BigNumber;
+      isEmployed(addr: Address): Promise<boolean>;
+
+      getEmployees(): Promise<[Address[], BigNumber[]]>;
     }
 
     interface MigrationsContract extends Contract<Migrations> {

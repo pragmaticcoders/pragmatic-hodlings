@@ -1,12 +1,17 @@
-import {assert} from 'chai';
+import { assert } from 'chai';
 
 import * as Web3 from 'web3';
 
-import {Holder, HoldingsArtifacts, } from 'holdings';
+import {
+  EmployeeFiredEvent,
+  EmployeeRegisteredEvent,
+  Holder,
+  HoldingsArtifacts
+} from 'holdings';
 
 import BigNumber from 'bignumber.js';
-import {ContractContextDefinition} from 'truffle';
-import {assertNumberEqual, assertReverts} from './helpers';
+import { ContractContextDefinition } from 'truffle';
+import { assertNumberEqual, assertReverts, findLastLog } from './helpers';
 
 declare const web3: Web3;
 declare const artifacts: HoldingsArtifacts;
@@ -46,6 +51,24 @@ contract('Holder', accounts => {
       assertNumberEqual(currentEmployees[0].joinTimestamp, employeeTimestamp);
     });
 
+    it('Should emit EmployeeRegistered event', async () => {
+      const employee = accounts[1];
+      const employeeTimestamp = 100;
+      const registerTx =
+        await holder.registerEmployee(
+          employee,
+          employeeTimestamp,
+          {from: owner}
+        );
+
+      const log = findLastLog(registerTx, 'EmployeeRegistered');
+      assert.isOk(log);
+      const event = log.args as EmployeeRegisteredEvent;
+      assert.isOk(event);
+      assert.equal(event.addr, employee);
+      assertNumberEqual(event.joinTimestamp, new BigNumber(employeeTimestamp));
+    });
+
     it('Should add few employees', async () => {
       const employees: Employee[] =
         accounts.map(
@@ -71,7 +94,7 @@ contract('Holder', accounts => {
           registeredEmployees.find((item) => item.address === employee.address);
 
         assert.isOk(registered);
-        if (registered) { // ts2532 posibbly undefined workaround
+        if (registered) { // 'ts2532 posibbly undefined' workaround
           assertNumberEqual(registered.joinTimestamp, employee.joinTimestamp);
         }
       });
@@ -101,6 +124,78 @@ contract('Holder', accounts => {
       });
     });
   });
+
+  describe('#fireEmployee', () => {
+
+    let registeredEmployees: Employee[] = [];
+
+    beforeEach(async () => {
+      registeredEmployees =
+        accounts.map((address, idx): Employee => ({
+          address,
+          joinTimestamp: new BigNumber(idx).add(1)
+        }));
+
+      await registeredEmployees.forEach(async (employee) => {
+        await holder.registerEmployee(
+          employee.address,
+          employee.joinTimestamp,
+          {from: owner}
+        );
+      });
+
+      assertNumberEqual(
+        (await holder.getEmployees())[0].length,
+        registeredEmployees.length,
+      );
+    });
+
+    it('Should remove employee', async () => {
+      const employeeToFire = accounts[2];
+      assert.isTrue(await holder.isEmployed(employeeToFire));
+
+      await holder.fireEmployee(employeeToFire, {from: owner});
+
+      assert.isFalse(await holder.isEmployed(employeeToFire));
+
+      const currentEmployees: Employee[] =
+        parseEmployees(await holder.getEmployees());
+      assert.equal(currentEmployees.length, registeredEmployees.length - 1);
+      assert.isNotOk(
+        currentEmployees.find(employee => employee.address === employeeToFire)
+      );
+    });
+
+    it('Should emit EmployeeFired event', async () => {
+      const employeeToFire = accounts[2];
+      assert.isTrue(await holder.isEmployed(employeeToFire));
+
+      const fireTx = await holder.fireEmployee(employeeToFire, {from: owner});
+
+      const log = findLastLog(fireTx, 'EmployeeFired');
+      assert.isOk(log);
+      const event = log.args as EmployeeFiredEvent;
+      assert.isOk(event);
+      assert.equal(event.addr, employeeToFire);
+    });
+
+    it('Should revert if not owner', async () => {
+      await assertReverts(async () => {
+        await holder.fireEmployee(accounts[2], {from: nonOwner});
+      });
+    });
+
+    it('Should revert if is not employed', async () => {
+      const employeeToFire = accounts[2];
+      await holder.fireEmployee(employeeToFire, {from: owner});
+      assert.isFalse(await holder.isEmployed(employeeToFire));
+
+      await assertReverts(async () => {
+        await holder.fireEmployee(employeeToFire, {from: owner});
+      });
+    });
+  });
+
 });
 
 interface Employee {
