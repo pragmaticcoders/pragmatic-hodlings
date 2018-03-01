@@ -4,7 +4,8 @@
     "mainType": "holdings",
     "author": "",
     "contracts": [
-      "Holder"
+      "Holder",
+      "TestToken"
     ],
     "solidityVersion": "0.4.19"
   }
