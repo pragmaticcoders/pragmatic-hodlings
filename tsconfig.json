@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "strict": true,
+    "noImplicitAny": true,
+    "types": ["bignumber.js", "chai", "mocha", "node"]
+  },
+  "include": [
+    "migrations/**/*.ts",
+    "test/**/*.ts",
+    "truffle-config.ts",
+    "types/**/*.ts",
+    "utils/**/*.ts"
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "name": "pragmatic-holings-contracts",
+  "version": "0.0.0",
+  "main": "index.js",
+  "scripts": {
+    "compile": "run-s compile:ts compile:sol",
+    "compile:sol": "truffle compile",
+    "compile:ts": "tsc",
+    "test": "run-s compile:ts test:js",
+    "test:js": "truffle test",
+    "lint": "run-p -c --aggregate-output lint:solhint lint:tslint",
+    "lint:tslint": "tslint --project .",
+    "lint:tslint:fix": "tslint --fix --project .",
+    "lint:solhint": "solhint \"contracts/**/*.sol\" \"build/flat/*.sol\"",
+    "format": "prettier --write \"**/*.ts\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pragmaticcoders/pragmatic-holdings"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.0.8",
+    "@types/mocha": "^2.2.44",
+    "@types/node": "^8.0.57",
+    "@types/ramda": "^0.25.8",
+    "bignumber.js": "^5.0.0",
+    "chai": "^4.1.2",
+    "npm-run-all": "^4.1.2",
+    "prettier": "^1.9.2",
+    "ramda": "^0.25.0",
+    "solhint": "^1.1.10",
+    "truffle": "4.0.6",
+    "tslint": "^5.8.0",
+    "typescript": "^2.6.2"
+  }
+}

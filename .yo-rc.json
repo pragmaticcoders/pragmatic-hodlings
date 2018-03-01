@@ -1,0 +1,11 @@
+{
+  "generator-ts-truffle": {
+    "name": "pragmatic-holings-contracts",
+    "mainType": "holdings",
+    "author": "",
+    "contracts": [
+      "Holder"
+    ],
+    "solidityVersion": "0.4.19"
+  }
+}
