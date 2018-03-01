@@ -8,6 +8,7 @@ declare module 'holdings' {
     TransactionResult,
     TruffleArtifacts
   } from 'truffle';
+  import { AnyNumber } from 'web3';
 
   namespace holdings {
     interface Migrations extends ContractBase {
@@ -45,20 +46,46 @@ declare module 'holdings' {
       value: BigNumber;
     }
 
-    interface TestToken extends ERC20Basic, Ownable {
-      name(): Promise<string>;
-      symbol(): Promise<string>;
+    interface MintableToken extends ERC20Basic, Ownable {
+      mintingFinished(): Promise<boolean>;
+
+      mint(
+        to: Address,
+        amount: AnyNumber,
+        options?: TransactionOptions
+      ): Promise<TransactionResult>;
+
+      finishMinting(options?: TransactionOptions): Promise<TransactionResult>;
     }
 
-    interface Holder extends ContractBase {
+    interface MintedEvent {
+      to: Address;
+      amount: BigNumber;
+    }
+
+    type MintingFinishedEvent = {};
+
+    interface TestToken extends MintableToken {
+      name(): Promise<string>;
+      symbol(): Promise<string>;
+      totalSupply(): Promise<BigNumber>;
+    }
+
+    interface Holder extends ContractBase, Ownable {
+      // remove this after implementing real addEmployee function
+      addEmployee(
+        employeeAddress: Address,
+        options?: TransactionOptions
+      ): Promise<TransactionResult>;
+
       settleToken(
-        toke: TestToken,
+        token: Address,
         options?: TransactionOptions
       ): Promise<TransactionResult>;
     }
 
     interface TokenSettledEvent {
-      tokenAddress: Address;
+      token: Address;
       amount: BigNumber;
     }
 
@@ -70,6 +97,7 @@ declare module 'holdings' {
       'new'(
         name: string,
         symbol: string,
+        totalSupply: AnyNumber,
         options?: TransactionOptions
       ): Promise<TestToken>;
     }
