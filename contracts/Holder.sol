@@ -3,29 +3,17 @@ pragma solidity 0.4.19;
 
 /**
  * @title Holder
- * @dev Holder contract allows to..
+ * @dev Holder contract allows to
  */
 contract Holder {
-    
-    uint256 public exampleAttribute;
 
-    modifier onlyExampleCondition(uint256 value) {
-        require(value > 10);
-        _;
+    struct Employee {
+        address addr; // 20 bytes
+        uint32 joinTimestamp; // is uint32 enough??
     }
 
-    event ExampleAttributeChanged(uint256 newValue);
+    Employee[] employees;
 
     function Holder() public {
-        exampleAttribute = 10;
-    }
-
-    function exampleFunction(uint256 newValue)
-        public
-        onlyExampleCondition(newValue)
-    {
-        exampleAttribute = newValue;
-
-        ExampleAttributeChanged(newValue);
     }
 }
