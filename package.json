@@ -1,5 +1,6 @@
 {
   "name": "pragmatic-holings-contracts",
+  "description": "Proportionally distribute contract's tokens to each employee",
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
@@ -33,5 +34,8 @@
     "truffle": "4.0.6",
     "tslint": "^5.8.0",
     "typescript": "^2.6.2"
+  },
+  "dependencies": {
+    "zeppelin-solidity": "^1.7.0"
   }
 }
