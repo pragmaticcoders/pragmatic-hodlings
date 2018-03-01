@@ -32,6 +32,8 @@
     "solhint": "^1.1.10",
     "truffle": "4.0.6",
     "tslint": "^5.8.0",
-    "typescript": "^2.6.2"
-  }
+    "typescript": "^2.6.2",
+    "zeppelin-solidity": "^1.7.0"
+  },
+  "dependencies": {}
 }

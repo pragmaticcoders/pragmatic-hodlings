@@ -1,5 +1,5 @@
 declare module 'holdings' {
-  import {BigNumber} from 'bignumber.js';
+  import BigNumber from 'bignumber.js';
   import {
     AnyContract,
     Contract,
@@ -20,12 +20,13 @@ declare module 'holdings' {
     }
 
     interface Holder extends ContractBase {
-      exampleAttribute(): Promise<BigNumber>;
+      registerEmployee(addr: Address,
+                       joinTimestamp: AnyNumber,
+                       options?: TransactionOptions
+      ): Promise<TransactionResult>;
 
-      exampleFunction(newValue: AnyNumber,
-                      options?: TransactionOptions): Promise<TransactionResult>;
+      getEmployees(): Promise<[Address[], BigNumber[]]>;
     }
-
 
     interface ExampleAttributeChangedEvent {
       newValue: BigNumber;
