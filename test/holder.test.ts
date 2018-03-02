@@ -11,7 +11,7 @@ import {
   TokenSettledEvent
 } from 'holdings';
 
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import { ContractContextDefinition } from 'truffle';
 import { assertNumberEqual, assertReverts, findLastLog } from './helpers';
 
@@ -28,7 +28,7 @@ contract('Holder', accounts => {
   let holder: Holder;
 
   beforeEach(async () => {
-    holder = await HolderContract.new({from: owner});
+    holder = await HolderContract.new({ from: owner });
   });
 
   describe('#ctor', () => {
@@ -133,7 +133,7 @@ contract('Holder', accounts => {
     it('Should add one employee', async () => {
       const employee = accounts[1];
       const employeeTimestamp = 100;
-      await holder.registerEmployee(employee, employeeTimestamp, {from: owner});
+      await holder.registerEmployee(employee, employeeTimestamp, { from: owner });
 
       const currentEmployees: Employee[] =
         parseEmployees(await holder.getEmployees());
@@ -149,7 +149,7 @@ contract('Holder', accounts => {
         await holder.registerEmployee(
           employee,
           employeeTimestamp,
-          {from: owner}
+          { from: owner }
         );
 
       const log = findLastLog(registerTx, 'EmployeeRegistered');
@@ -172,7 +172,7 @@ contract('Holder', accounts => {
         await holder.registerEmployee(
           employee.address,
           employee.joinTimestamp,
-          {from: owner}
+          { from: owner }
         );
       });
 
@@ -180,14 +180,13 @@ contract('Holder', accounts => {
         parseEmployees(await holder.getEmployees());
 
       assertNumberEqual(registeredEmployees.length, employees.length);
-      employees.forEach(employee => {
+
+      employees.forEach((employee) => {
         const registered =
           registeredEmployees.find((item) => item.address === employee.address);
 
         assert.isOk(registered);
-        if (registered) { // 'ts2532 posibbly undefined' workaround
-          assertNumberEqual(registered.joinTimestamp, employee.joinTimestamp);
-        }
+        assertNumberEqual(registered!.joinTimestamp, employee.joinTimestamp);
       });
     });
 
@@ -196,7 +195,7 @@ contract('Holder', accounts => {
         await holder.registerEmployee(
           accounts[1],
           100,
-          {from: nonOwner}
+          { from: nonOwner }
         );
       });
     });
@@ -204,13 +203,13 @@ contract('Holder', accounts => {
     it('Should revert if already exists', async () => {
       const employee = accounts[1];
       const employeeTimestamp = 100;
-      await holder.registerEmployee(employee, employeeTimestamp, {from: owner});
+      await holder.registerEmployee(employee, employeeTimestamp, { from: owner });
 
       await assertReverts(async () => {
         await holder.registerEmployee(
           employee,
           employeeTimestamp,
-          {from: owner}
+          { from: owner }
         );
       });
     });
@@ -231,7 +230,7 @@ contract('Holder', accounts => {
         await holder.registerEmployee(
           employee.address,
           employee.joinTimestamp,
-          {from: owner}
+          { from: owner }
         );
       });
 
@@ -245,7 +244,7 @@ contract('Holder', accounts => {
       const employeeToFire = accounts[2];
       assert.isTrue(await holder.isEmployed(employeeToFire));
 
-      await holder.fireEmployee(employeeToFire, {from: owner});
+      await holder.fireEmployee(employeeToFire, { from: owner });
 
       assert.isFalse(await holder.isEmployed(employeeToFire));
 
@@ -261,7 +260,7 @@ contract('Holder', accounts => {
       const employeeToFire = accounts[2];
       assert.isTrue(await holder.isEmployed(employeeToFire));
 
-      const fireTx = await holder.fireEmployee(employeeToFire, {from: owner});
+      const fireTx = await holder.fireEmployee(employeeToFire, { from: owner });
 
       const log = findLastLog(fireTx, 'EmployeeFired');
       assert.isOk(log);
@@ -272,17 +271,17 @@ contract('Holder', accounts => {
 
     it('Should revert if not owner', async () => {
       await assertReverts(async () => {
-        await holder.fireEmployee(accounts[2], {from: nonOwner});
+        await holder.fireEmployee(accounts[2], { from: nonOwner });
       });
     });
 
     it('Should revert if is not employed', async () => {
       const employeeToFire = accounts[2];
-      await holder.fireEmployee(employeeToFire, {from: owner});
+      await holder.fireEmployee(employeeToFire, { from: owner });
       assert.isFalse(await holder.isEmployed(employeeToFire));
 
       await assertReverts(async () => {
-        await holder.fireEmployee(employeeToFire, {from: owner});
+        await holder.fireEmployee(employeeToFire, { from: owner });
       });
     });
   });

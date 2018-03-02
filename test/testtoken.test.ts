@@ -4,7 +4,7 @@ import * as Web3 from 'web3';
 
 import { HoldingsArtifacts, TestToken } from 'holdings';
 
-import BigNumber from 'bignumber.js';
+import { BigNumber } from 'bignumber.js';
 import { ContractContextDefinition } from 'truffle';
 import { assertNumberEqual } from './helpers';
 

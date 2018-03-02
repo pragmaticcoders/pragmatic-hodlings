@@ -12,6 +12,8 @@ import { BasicToken } from "zeppelin-solidity/contracts/token/ERC20/BasicToken.s
  */
 contract Holder is Ownable {
 
+    uint256 constant DAY_IN_SECONDS = 86400;
+
     using SafeMath for uint256;
 
     struct Employee {
@@ -121,13 +123,11 @@ contract Holder is Ownable {
     {
         uint256[] memory tokenShares = new uint256[](employees.length);
 
-        uint256 dayInSeconds = 86400;
         uint256 daysSum = 0;
         for (uint i = 0; i < employees.length; i++) {
-            /* solhint-disable not-rely-on-time */
+            // solhint-disable-next-line not-rely-on-time
             uint256 employeeSeniority = now.sub(employees[i].joinTimestamp);
-            /* solhint-enable not-rely-on-time */
-            tokenShares[i] = employeeSeniority.div(dayInSeconds).add(1);
+            tokenShares[i] = employeeSeniority.div(DAY_IN_SECONDS).add(1);
             daysSum = daysSum.add(tokenShares[i]);
         }
 

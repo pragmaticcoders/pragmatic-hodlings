@@ -126,11 +126,8 @@ declare module 'holdings' {
 
     interface HoldingsArtifacts extends TruffleArtifacts {
       require(name: string): AnyContract;
-
       require(name: './Migrations.sol'): MigrationsContract;
-
       require(name: './TestToken.sol'): TestTokenContract;
-
       require(name: './Holder.sol'): HolderContract;
     }
   }
