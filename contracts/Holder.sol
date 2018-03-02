@@ -6,7 +6,9 @@ import { BasicToken } from "zeppelin-solidity/contracts/token/ERC20/BasicToken.s
 
 
 /**
- * @title Proportionally distribute contract's tokens to each hodler
+ * @title Proportionally distribute contract's tokens to each registered hodler
+ * @dev Proportion is calculated based on joined timestamp
+ * @dev Group of hodlers and settlements are managed by contract owner
  * @author Wojciech Harzowski (https://github.com/harzo)
  * @author Dominik Kroliczek (https://github.com/kruligh)
  */
@@ -63,6 +65,11 @@ contract PragmaticHodlings is Ownable {
      */
     event HodlerFired(address account);
 
+    /**
+    * @dev Register new hodler
+    * @param account address The hodler address
+    * @param joinTimestamp uint32 Timestamp, when hodler joined
+    */
     function registerHodler(address account, uint32 joinTimestamp)
         public
         onlyOwner
@@ -77,9 +84,14 @@ contract PragmaticHodlings is Ownable {
         HodlerRegistered(account, joinTimestamp);
     }
 
+    /**
+    * @dev Fire hodler
+    * @param account address The hodler address
+    */
     function fireHodler(address account)
         public
         onlyOwner
+        onlyIfHodler(account)
     {
         uint256 firedIndex = getHodlerIndex(account);
 
@@ -138,6 +150,11 @@ contract PragmaticHodlings is Ownable {
         return tokenShares;
     }
 
+    /**
+     * @dev Returns hodlers and their timestamps
+     * @return address[] Addresses of hodlers
+     * @return uint32[] join timestamps. Relating by index with addresses
+     */
     function getHodlers() public view returns (address[], uint32[]) {
         address[] memory hodlersAddresses = new address[](hodlers.length);
         uint32[] memory hodlersTimestamps = new uint32[](hodlers.length);
@@ -150,6 +167,10 @@ contract PragmaticHodlings is Ownable {
         return (hodlersAddresses, hodlersTimestamps);
     }
 
+    /**
+    * @param account address Hodler address
+    * @return bool whether account is registered as holder
+    */
     function isHodler(address account) public view returns (bool) {
         for (uint256 i = 0; i < hodlers.length; i++) {
             if (hodlers[i].account == account) {
@@ -161,7 +182,6 @@ contract PragmaticHodlings is Ownable {
     function getHodlerIndex(address account)
         internal
         view
-        onlyIfHodler(account)
         returns (uint256)
     {
         for (uint256 i = 0; i < hodlers.length; i++) {
