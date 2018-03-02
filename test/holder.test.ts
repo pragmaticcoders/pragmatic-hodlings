@@ -217,26 +217,18 @@ contract('Holder', accounts => {
 
   describe('#fireEmployee', () => {
 
-    let registeredEmployees: Employee[] = [];
-
     beforeEach(async () => {
-      registeredEmployees =
-        accounts.map((address, idx): Employee => ({
-          address,
-          joinTimestamp: new BigNumber(idx).add(1)
-        }));
-
-      await registeredEmployees.forEach(async (employee) => {
+      await accounts.forEach(async (account, idx) => {
         await holder.registerEmployee(
-          employee.address,
-          employee.joinTimestamp,
+          account,
+          new BigNumber(idx).add(1),
           { from: owner }
         );
       });
 
       assertNumberEqual(
         (await holder.getEmployees())[0].length,
-        registeredEmployees.length,
+        accounts.length,
       );
     });
 
@@ -250,7 +242,7 @@ contract('Holder', accounts => {
 
       const currentEmployees: Employee[] =
         parseEmployees(await holder.getEmployees());
-      assert.equal(currentEmployees.length, registeredEmployees.length - 1);
+      assert.equal(currentEmployees.length, accounts.length - 1);
       assert.isNotOk(
         currentEmployees.find(employee => employee.address === employeeToFire)
       );
