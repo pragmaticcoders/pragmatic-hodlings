@@ -2,7 +2,7 @@ import { assert } from 'chai';
 
 import * as Web3 from 'web3';
 
-import { HoldingsArtifacts, TestToken } from 'holdings';
+import { HoldingsArtifacts, TestToken } from 'hodlings';
 
 import { BigNumber } from 'bignumber.js';
 import { ContractContextDefinition } from 'truffle';

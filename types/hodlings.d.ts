@@ -1,4 +1,4 @@
-declare module 'holdings' {
+declare module 'hodlings' {
   import { BigNumber } from 'bignumber.js';
   import {
     AnyContract,
@@ -10,7 +10,7 @@ declare module 'holdings' {
   } from 'truffle';
   import { AnyNumber } from 'web3';
 
-  namespace holdings {
+  namespace hodlings {
 
     interface Migrations extends ContractBase {
       setCompleted(
@@ -72,18 +72,16 @@ declare module 'holdings' {
     interface TokenSettledEvent {
       token: Address;
       amount: BigNumber;
-
-      getEmployees(): Promise<[Address[], BigNumber[]]>;
     }
 
-    interface Holder extends ContractBase, Ownable {
-      registerEmployee(
+    interface PragmaticHodlings extends ContractBase, Ownable {
+      registerHodler(
         account: Address,
         joinTimestamp: AnyNumber,
         options?: TransactionOptions
       ): Promise<TransactionResult>;
 
-      fireEmployee(
+      fireHodler(
         account: Address,
         options?: TransactionOptions
       ): Promise<TransactionResult>;
@@ -93,17 +91,17 @@ declare module 'holdings' {
         options?: TransactionOptions
       ): Promise<TransactionResult>;
 
-      isEmployed(account: Address): Promise<boolean>;
+      isHodler(account: Address): Promise<boolean>;
 
-      getEmployees(): Promise<[Address[], BigNumber[]]>;
+      getHodlers(): Promise<[Address[], BigNumber[]]>;
     }
 
-    interface EmployeeRegisteredEvent {
+    interface HodlerRegisteredEvent {
       account: Address;
       joinTimestamp: BigNumber;
     }
 
-    interface EmployeeFiredEvent {
+    interface HodlerFiredEvent {
       account: Address;
     }
 
@@ -120,17 +118,17 @@ declare module 'holdings' {
       ): Promise<TestToken>;
     }
 
-    interface HolderContract extends Contract<Holder> {
-      'new'(options?: TransactionOptions): Promise<Holder>;
+    interface PragmaticHodlingsContract extends Contract<PragmaticHodlings> {
+      'new'(options?: TransactionOptions): Promise<PragmaticHodlings>;
     }
 
     interface HoldingsArtifacts extends TruffleArtifacts {
       require(name: string): AnyContract;
       require(name: './Migrations.sol'): MigrationsContract;
       require(name: './TestToken.sol'): TestTokenContract;
-      require(name: './Holder.sol'): HolderContract;
+      require(name: './PragmaticHodlings.sol'): PragmaticHodlingsContract;
     }
   }
 
-  export = holdings;
+  export = hodlings;
 }

@@ -1,12 +1,12 @@
-import { HoldingsArtifacts } from 'holdings';
+import { HoldingsArtifacts } from 'hodlings';
 import { Deployer } from 'truffle';
 
 declare const artifacts: HoldingsArtifacts;
 
-const Holder = artifacts.require('./Holder.sol');
+const PragmaticHodlings = artifacts.require('./PragmaticHodlings.sol');
 
 async function deploy(deployer: Deployer) {
-  await deployer.deploy(Holder);
+  await deployer.deploy(PragmaticHodlings);
 }
 
 function migrate(deployer: Deployer) {

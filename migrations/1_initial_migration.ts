@@ -1,4 +1,4 @@
-import { HoldingsArtifacts } from 'holdings';
+import { HoldingsArtifacts } from 'hodlings';
 import { Deployer } from 'truffle';
 
 declare const artifacts: HoldingsArtifacts;

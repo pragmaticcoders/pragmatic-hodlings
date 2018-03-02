@@ -6,35 +6,35 @@ import { BasicToken } from "zeppelin-solidity/contracts/token/ERC20/BasicToken.s
 
 
 /**
- * @title Proportionally distribute contract's tokens to each employee
+ * @title Proportionally distribute contract's tokens to each hodler
  * @author Wojciech Harzowski (https://github.com/harzo)
  * @author Dominik Kroliczek (https://github.com/kruligh)
  */
-contract Holder is Ownable {
-
-    uint256 constant DAY_IN_SECONDS = 86400;
+contract PragmaticHodlings is Ownable {
 
     using SafeMath for uint256;
 
-    struct Employee {
+    uint256 private constant DAY_IN_SECONDS = 86400;
+
+    struct Hodler {
         address account;
         uint32 joinTimestamp;
     }
 
-    Employee[] private employees;
+    Hodler[] private hodlers;
 
-    modifier onlyIfEmployeesExist {
-        require(employees.length != 0);
+    modifier onlyIfHodlersExist {
+        require(hodlers.length != 0);
         _;
     }
 
-    modifier onlyEmployed(address account) {
-        require(isEmployed(account) == true);
+    modifier onlyIfHodler(address account) {
+        require(isHodler(account) == true);
         _;
     }
 
-    modifier onlyNotEmployed(address account) {
-        require(isEmployed(account) == false);
+    modifier onlyNotHodler(address account) {
+        require(isHodler(account) == false);
         _;
     }
 
@@ -44,68 +44,68 @@ contract Holder is Ownable {
     }
 
     /**
-     * @dev Token is settled on employees addresses
+     * @dev Token is settled on hodlers addresses
      * @param token address The token address
      * @param amount uint256 Settled amount
      */
     event TokenSettled(address token, uint256 amount);
 
     /**
-    * @dev New employee registered
-    * @param account address The employee address
-    * @param joinTimestamp uint32 Timestamp, when employee joined to company
+    * @dev New hodler registered
+    * @param account address The hodler address
+    * @param joinTimestamp uint32 Timestamp, when hodler joined
     */
-    event EmployeeRegistered(address account, uint32 joinTimestamp);
+    event HodlerRegistered(address account, uint32 joinTimestamp);
 
     /**
-     * @dev Employee fired
-     * @param account address Fired employe address
+     * @dev Hodler fired
+     * @param account address Fired hodler address
      */
-    event EmployeeFired(address account);
+    event HodlerFired(address account);
 
-    function registerEmployee(address account, uint32 joinTimestamp)
+    function registerHodler(address account, uint32 joinTimestamp)
         public
         onlyOwner
-        onlyNotEmployed(account)
+        onlyNotHodler(account)
     {
-        employees.push(
-            Employee({
+        hodlers.push(
+            Hodler({
                 account: account,
                 joinTimestamp: joinTimestamp
             }));
 
-        EmployeeRegistered(account, joinTimestamp);
+        HodlerRegistered(account, joinTimestamp);
     }
 
-    function fireEmployee(address account)
+    function fireHodler(address account)
         public
         onlyOwner
     {
-        uint256 firedIndex = getEmployeeIndex(account);
+        uint256 firedIndex = getHodlerIndex(account);
 
-        delete employees[firedIndex];
-        employees[firedIndex] = employees[employees.length - 1];
-        employees.length--;
+        delete hodlers[firedIndex];
+        hodlers[firedIndex] = hodlers[hodlers.length - 1];
+        hodlers.length--;
 
-        EmployeeFired(account);
+        HodlerFired(account);
     }
 
     /**
-     * @dev Settles given token on employees addresses
+     * @dev Settles given token on hodlers addresses
      * @param token BasicToken The token to settle
      */
     function settleToken(BasicToken token)
         public
         onlyOwner
-        onlyIfEmployeesExist
+        onlyIfHodlersExist
         onlySufficientAmount(token)
     {
         uint256 tokenAmount = token.balanceOf(this);
 
         uint256[] memory tokenShares = calculateShares(tokenAmount);
 
-        for (uint i = 0; i < employees.length; i++) {
-            token.transfer(employees[i].account, tokenShares[i]);
+        for (uint i = 0; i < hodlers.length; i++) {
+            token.transfer(hodlers[i].account, tokenShares[i]);
         }
 
         TokenSettled(token, tokenAmount);
@@ -113,7 +113,7 @@ contract Holder is Ownable {
 
     /**
      * @dev Calculates proportional share in given amount
-     * @param amount uint256 Amount to share between employees
+     * @param amount uint256 Amount to share between hodlers
      * @return tokenShares uint256[] Calculated shares
      */
     function calculateShares(uint256 amount)
@@ -121,51 +121,51 @@ contract Holder is Ownable {
         view
         returns (uint256[])
     {
-        uint256[] memory tokenShares = new uint256[](employees.length);
+        uint256[] memory tokenShares = new uint256[](hodlers.length);
 
         uint256 daysSum = 0;
-        for (uint i = 0; i < employees.length; i++) {
+        for (uint i = 0; i < hodlers.length; i++) {
             // solhint-disable-next-line not-rely-on-time
-            uint256 employeeSeniority = now.sub(employees[i].joinTimestamp);
-            tokenShares[i] = employeeSeniority.div(DAY_IN_SECONDS).add(1);
+            uint256 hodlerSeniority = now.sub(hodlers[i].joinTimestamp);
+            tokenShares[i] = hodlerSeniority.div(DAY_IN_SECONDS).add(1);
             daysSum = daysSum.add(tokenShares[i]);
         }
 
-        for (i = 0; i < employees.length; i++) {
+        for (i = 0; i < hodlers.length; i++) {
             tokenShares[i] = amount.mul(tokenShares[i]).div(daysSum);
         }
 
         return tokenShares;
     }
 
-    function getEmployees() public view returns (address[], uint32[]) {
-        address[] memory employeesAddresses = new address[](employees.length);
-        uint32[] memory employeesTimestamps = new uint32[](employees.length);
+    function getHodlers() public view returns (address[], uint32[]) {
+        address[] memory hodlersAddresses = new address[](hodlers.length);
+        uint32[] memory hodlersTimestamps = new uint32[](hodlers.length);
 
-        for (uint256 i = 0; i < employees.length; i++) {
-            employeesAddresses[i] = employees[i].account;
-            employeesTimestamps[i] = employees[i].joinTimestamp;
+        for (uint256 i = 0; i < hodlers.length; i++) {
+            hodlersAddresses[i] = hodlers[i].account;
+            hodlersTimestamps[i] = hodlers[i].joinTimestamp;
         }
 
-        return (employeesAddresses, employeesTimestamps);
+        return (hodlersAddresses, hodlersTimestamps);
     }
 
-    function isEmployed(address account) public view returns (bool) {
-        for (uint256 i = 0; i < employees.length; i++) {
-            if (employees[i].account == account) {
+    function isHodler(address account) public view returns (bool) {
+        for (uint256 i = 0; i < hodlers.length; i++) {
+            if (hodlers[i].account == account) {
                 return true;
             }
         }
     }
 
-    function getEmployeeIndex(address account)
+    function getHodlerIndex(address account)
         internal
-        onlyEmployed(account)
-
+        view
+        onlyIfHodler(account)
         returns (uint256)
     {
-        for (uint256 i = 0; i < employees.length; i++) {
-            if (employees[i].account == account) {
+        for (uint256 i = 0; i < hodlers.length; i++) {
+            if (hodlers[i].account == account) {
                 return i;
             }
         }
