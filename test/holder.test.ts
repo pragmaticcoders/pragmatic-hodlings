@@ -13,7 +13,10 @@ import {
 
 import { BigNumber } from 'bignumber.js';
 import { ContractContextDefinition } from 'truffle';
-import { assertNumberEqual, assertReverts, findLastLog } from './helpers';
+import {
+    assertNumberEqual, assertReverts, findLastLog,
+    getUnixNow
+} from './helpers';
 
 declare const web3: Web3;
 declare const artifacts: HoldingsArtifacts;
@@ -75,6 +78,10 @@ contract('PragmaticHodlings', accounts => {
     });
 
     context('after token transfer and hodlers addition', () => {
+    const hourInSeconds = new BigNumber(3600);
+    const dayInSeconds = new BigNumber(24).mul(hourInSeconds);
+    const joinTimeStamp = getUnixNow().sub(dayInSeconds.mul(2));
+
       beforeEach(async () => {
         await token.transfer(
           hodlings.address,
@@ -86,9 +93,9 @@ contract('PragmaticHodlings', accounts => {
           transferAmount
         );
 
-        await hodlings.registerHodler(accounts[1], 100, { from: owner });
-        await hodlings.registerHodler(accounts[2], 100, { from: owner });
-        await hodlings.registerHodler(accounts[3], 100, { from: owner });
+        await hodlings.registerHodler(accounts[1], joinTimeStamp.sub(hourInSeconds), { from: owner });
+        await hodlings.registerHodler(accounts[2], joinTimeStamp, { from: owner });
+        await hodlings.registerHodler(accounts[3], joinTimeStamp.add(hourInSeconds), { from: owner });
       });
 
       it('should emit TokenSettled event', async () => {
@@ -102,7 +109,7 @@ contract('PragmaticHodlings', accounts => {
         assertNumberEqual(event.amount, transferAmount);
       });
 
-      it('should transfer token shares to hodlers', async () => {
+      it('should transfer equal token shares to hodlers', async () => {
         await hodlings.settleToken(token.address, { from: owner });
 
         assertNumberEqual(
@@ -117,6 +124,43 @@ contract('PragmaticHodlings', accounts => {
           await token.balanceOf(accounts[3]),
           transferAmount.div(3).floor()
         );
+      });
+
+      it('should transfer token shares depending on seniority', async () => {
+          await hodlings.registerHodler(accounts[4], joinTimeStamp.add(dayInSeconds), { from: owner });
+          await hodlings.registerHodler(accounts[5], joinTimeStamp.add(dayInSeconds.mul(2)), { from: owner });
+
+          await hodlings.settleToken(token.address, { from: owner });
+
+          console.log(await token.balanceOf(accounts[1]));
+          console.log(await token.balanceOf(accounts[2]));
+          console.log(await token.balanceOf(accounts[3]));
+          console.log(await token.balanceOf(accounts[4]));
+          console.log(await token.balanceOf(accounts[5]));
+          assertNumberEqual(
+              await token.balanceOf(accounts[1]),
+              transferAmount.mul(3).div(12).floor()
+          );
+          assertNumberEqual(
+              await token.balanceOf(accounts[2]),
+              transferAmount.mul(3).div(12).floor()
+          );
+
+          assertNumberEqual(
+              await token.balanceOf(accounts[3]),
+              transferAmount.mul(3).div(12).floor()
+          );
+
+          assertNumberEqual(
+              await token.balanceOf(accounts[4]),
+              transferAmount.mul(2).div(12).floor()
+          );
+
+          assertNumberEqual(
+              await token.balanceOf(accounts[5]),
+              transferAmount.mul(1).div(12).floor()
+          );
+
       });
 
       it('should revert for non-owner', async () => {

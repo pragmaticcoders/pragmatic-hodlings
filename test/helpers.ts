@@ -93,3 +93,7 @@ export function findLastLog(
 ): TransactionLog {
   return findLast(propEq('event', event))(trans.logs);
 }
+
+export function getUnixNow() {
+    return new BigNumber(Math.round(new Date().getTime())).div(1000);
+}

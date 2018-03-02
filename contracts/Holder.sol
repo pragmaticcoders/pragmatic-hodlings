@@ -17,6 +17,7 @@ contract PragmaticHodlings is Ownable {
     using SafeMath for uint256;
 
     uint256 private constant DAY_IN_SECONDS = 86400;
+    uint256 constant PROPORTION_DENOMINATOR = 1000;
 
     struct Hodler {
         address account;
@@ -135,16 +136,10 @@ contract PragmaticHodlings is Ownable {
     {
         uint256[] memory tokenShares = new uint256[](hodlers.length);
 
-        uint256 daysSum = 0;
-        for (uint i = 0; i < hodlers.length; i++) {
-            // solhint-disable-next-line not-rely-on-time
-            uint256 hodlerSeniority = now.sub(hodlers[i].joinTimestamp);
-            tokenShares[i] = hodlerSeniority.div(DAY_IN_SECONDS).add(1);
-            daysSum = daysSum.add(tokenShares[i]);
-        }
+        uint256[] memory proportions = calculateProportions();
 
-        for (i = 0; i < hodlers.length; i++) {
-            tokenShares[i] = amount.mul(tokenShares[i]).div(daysSum);
+        for (uint256 i = 0; i < employees.length; i++) {
+            tokenShares[i] = amount.mul(proportions[i]).div(PROPORTION_DENOMINATOR);
         }
 
         return tokenShares;
@@ -190,5 +185,35 @@ contract PragmaticHodlings is Ownable {
             }
         }
         assert(false);
+    }
+
+    function calculateProportions()
+        internal
+        view
+        returns (uint256[])
+    {
+        uint256[] memory proportions = new uint256[](hodlers.length);
+
+        uint minSeniority = 1;
+        uint daysSum = 0;
+        for (uint i = 0; i < proportions.length; i++) {
+            // solhint-disable-next-line not-rely-on-time
+            uint256 seniority = now.sub(hodlers[i].joinTimestamp);
+            uint256 daysSeniority = seniority.div(DAY_IN_SECONDS).add(1);
+            proportions[i] = daysSeniority;
+            daysSum = daysSum.add(daysSeniority);
+
+            if (daysSeniority < minSeniority || i == 0) {
+                minSeniority = daysSeniority;
+            }
+        }
+
+        uint256 subFactor = minSeniority.sub(1);
+        daysSum = daysSum.sub(subFactor.mul(proportions.length));
+        for (i = 0; i < proportions.length; i++) {
+            proportions[i] = (proportions[i].sub(subFactor)).mul(PROPORTION_DENOMINATOR).div(daysSum);
+        }
+
+        return proportions;
     }
 }
