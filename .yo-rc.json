@@ -1,10 +1,11 @@
 {
   "generator-ts-truffle": {
-    "name": "pragmatic-holings-contracts",
-    "mainType": "holdings",
+    "name": "pragmatic-hodlings-contracts",
+    "mainType": "hodlings",
     "author": "",
     "contracts": [
-      "Holder"
+      "PragmaticHodlings",
+      "TestToken"
     ],
     "solidityVersion": "0.4.19"
   }

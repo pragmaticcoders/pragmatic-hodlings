@@ -3,10 +3,10 @@ import { Deployer } from 'truffle';
 
 declare const artifacts: HoldingsArtifacts;
 
-const Migrations = artifacts.require('./Migrations.sol');
+const PragmaticHodlings = artifacts.require('./PragmaticHodlings.sol');
 
 async function deploy(deployer: Deployer) {
-  await deployer.deploy(Migrations);
+  await deployer.deploy(PragmaticHodlings);
 }
 
 function migrate(deployer: Deployer) {
