@@ -95,5 +95,5 @@ export function findLastLog(
 }
 
 export function getUnixNow() {
-    return new BigNumber(Math.round(new Date().getTime())).div(1000);
+  return new BigNumber(Math.round(new Date().getTime())).div(1000);
 }

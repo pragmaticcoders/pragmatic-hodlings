@@ -17,7 +17,7 @@ contract PragmaticHodlings is Ownable {
     using SafeMath for uint256;
 
     uint256 private constant DAY_IN_SECONDS = 86400;
-    uint256 constant PROPORTION_DENOMINATOR = 1000;
+    uint256 private constant PROPORTION_DENOMINATOR = 1000;
 
     struct Hodler {
         address account;
@@ -26,12 +26,12 @@ contract PragmaticHodlings is Ownable {
 
     Hodler[] private hodlers;
 
-    modifier onlyIfHodlersExist {
+    modifier onlyHodlersExist {
         require(hodlers.length != 0);
         _;
     }
 
-    modifier onlyIfHodler(address account) {
+    modifier onlyHodler(address account) {
         require(isHodler(account) == true);
         _;
     }
@@ -54,24 +54,24 @@ contract PragmaticHodlings is Ownable {
     event TokenSettled(address token, uint256 amount);
 
     /**
-    * @dev New hodler registered
+    * @dev New hodler added
     * @param account address The hodler address
     * @param joinTimestamp uint32 Timestamp, when hodler joined
     */
-    event HodlerRegistered(address account, uint32 joinTimestamp);
+    event HodlerAdded(address account, uint32 joinTimestamp);
 
     /**
-     * @dev Hodler fired
+     * @dev Hodler removed
      * @param account address Fired hodler address
      */
-    event HodlerFired(address account);
+    event HodlerRemoved(address account);
 
     /**
-    * @dev Register new hodler
+    * @dev Add new hodler
     * @param account address The hodler address
     * @param joinTimestamp uint32 Timestamp, when hodler joined
     */
-    function registerHodler(address account, uint32 joinTimestamp)
+    function addHodler(address account, uint32 joinTimestamp)
         public
         onlyOwner
         onlyNotHodler(account)
@@ -82,17 +82,17 @@ contract PragmaticHodlings is Ownable {
                 joinTimestamp: joinTimestamp
             }));
 
-        HodlerRegistered(account, joinTimestamp);
+        HodlerAdded(account, joinTimestamp);
     }
 
     /**
-    * @dev Fire hodler
+    * @dev Remove hodler
     * @param account address The hodler address
     */
-    function fireHodler(address account)
+    function removeHodler(address account)
         public
         onlyOwner
-        onlyIfHodler(account)
+        onlyHodler(account)
     {
         uint256 firedIndex = getHodlerIndex(account);
 
@@ -100,7 +100,7 @@ contract PragmaticHodlings is Ownable {
         hodlers[firedIndex] = hodlers[hodlers.length - 1];
         hodlers.length--;
 
-        HodlerFired(account);
+        HodlerRemoved(account);
     }
 
     /**
@@ -110,7 +110,7 @@ contract PragmaticHodlings is Ownable {
     function settleToken(BasicToken token)
         public
         onlyOwner
-        onlyIfHodlersExist
+        onlyHodlersExist
         onlySufficientAmount(token)
     {
         uint256 tokenAmount = token.balanceOf(this);
@@ -138,7 +138,7 @@ contract PragmaticHodlings is Ownable {
 
         uint256[] memory proportions = calculateProportions();
 
-        for (uint256 i = 0; i < employees.length; i++) {
+        for (uint256 i = 0; i < hodlers.length; i++) {
             tokenShares[i] = amount.mul(proportions[i]).div(PROPORTION_DENOMINATOR);
         }
 
@@ -150,7 +150,11 @@ contract PragmaticHodlings is Ownable {
      * @return address[] Addresses of hodlers
      * @return uint32[] join timestamps. Relating by index with addresses
      */
-    function getHodlers() public view returns (address[], uint32[]) {
+    function getHodlers()
+        public
+        view
+        returns (address[], uint32[])
+    {
         address[] memory hodlersAddresses = new address[](hodlers.length);
         uint32[] memory hodlersTimestamps = new uint32[](hodlers.length);
 
@@ -166,7 +170,11 @@ contract PragmaticHodlings is Ownable {
     * @param account address Hodler address
     * @return bool whether account is registered as holder
     */
-    function isHodler(address account) public view returns (bool) {
+    function isHodler(address account)
+        public
+        view
+        returns (bool)
+    {
         for (uint256 i = 0; i < hodlers.length; i++) {
             if (hodlers[i].account == account) {
                 return true;
