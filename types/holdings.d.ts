@@ -78,13 +78,13 @@ declare module 'holdings' {
 
     interface Holder extends ContractBase, Ownable {
       registerEmployee(
-        addr: Address,
+        account: Address,
         joinTimestamp: AnyNumber,
         options?: TransactionOptions
       ): Promise<TransactionResult>;
 
       fireEmployee(
-        addr: Address,
+        account: Address,
         options?: TransactionOptions
       ): Promise<TransactionResult>;
 
@@ -93,18 +93,18 @@ declare module 'holdings' {
         options?: TransactionOptions
       ): Promise<TransactionResult>;
 
-      isEmployed(addr: Address): Promise<boolean>;
+      isEmployed(account: Address): Promise<boolean>;
 
       getEmployees(): Promise<[Address[], BigNumber[]]>;
     }
 
     interface EmployeeRegisteredEvent {
-      addr: Address;
+      account: Address;
       joinTimestamp: BigNumber;
     }
 
     interface EmployeeFiredEvent {
-      addr: Address;
+      account: Address;
     }
 
     interface MigrationsContract extends Contract<Migrations> {

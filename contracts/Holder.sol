@@ -15,8 +15,8 @@ contract Holder is Ownable {
     using SafeMath for uint256;
 
     struct Employee {
-        address addr; // 20 bytes
-        uint32 joinTimestamp; // is uint32 enough??
+        address account;
+        uint32 joinTimestamp;
     }
 
     Employee[] private employees;
@@ -26,13 +26,13 @@ contract Holder is Ownable {
         _;
     }
 
-    modifier onlyEmployed(address _addr) {
-        require(isEmployed(_addr) == true);
+    modifier onlyEmployed(address account) {
+        require(isEmployed(account) == true);
         _;
     }
 
-    modifier onlyNotEmployed(address _addr) {
-        require(isEmployed(_addr) == false);
+    modifier onlyNotEmployed(address account) {
+        require(isEmployed(account) == false);
         _;
     }
 
@@ -50,43 +50,42 @@ contract Holder is Ownable {
 
     /**
     * @dev New employee registered
-    * @param addr address The employee address
+    * @param account address The employee address
     * @param joinTimestamp uint32 Timestamp, when employee joined to company
     */
-    event EmployeeRegistered(address addr, uint32 joinTimestamp);
+    event EmployeeRegistered(address account, uint32 joinTimestamp);
 
     /**
      * @dev Employee fired
-     * @param addr address Fired employe address
+     * @param account address Fired employe address
      */
-    event EmployeeFired(address addr);
+    event EmployeeFired(address account);
 
-    function registerEmployee(address _addr, uint32 _joinTimestamp)
+    function registerEmployee(address account, uint32 joinTimestamp)
         public
         onlyOwner
-        onlyNotEmployed(_addr)
+        onlyNotEmployed(account)
     {
         employees.push(
             Employee({
-                addr: _addr,
-                joinTimestamp: _joinTimestamp
+                account: account,
+                joinTimestamp: joinTimestamp
             }));
 
-        EmployeeRegistered(_addr, _joinTimestamp);
+        EmployeeRegistered(account, joinTimestamp);
     }
 
-    function fireEmployee(address _addr)
+    function fireEmployee(address account)
         public
         onlyOwner
     {
-        uint256 firedIndex = getEmployeeIndex(_addr);
-        Employee storage fired = employees[firedIndex];
+        uint256 firedIndex = getEmployeeIndex(account);
 
         delete employees[firedIndex];
         employees[firedIndex] = employees[employees.length - 1];
         employees.length--;
 
-        EmployeeFired(_addr);
+        EmployeeFired(account);
     }
 
     /**
@@ -104,7 +103,7 @@ contract Holder is Ownable {
         uint256[] memory tokenShares = calculateShares(tokenAmount);
 
         for (uint i = 0; i < employees.length; i++) {
-            token.transfer(employees[i].addr, tokenShares[i]);
+            token.transfer(employees[i].account, tokenShares[i]);
         }
 
         TokenSettled(token, tokenAmount);
@@ -144,28 +143,29 @@ contract Holder is Ownable {
         uint32[] memory employeesTimestamps = new uint32[](employees.length);
 
         for (uint256 i = 0; i < employees.length; i++) {
-            employeesAddresses[i] = employees[i].addr;
+            employeesAddresses[i] = employees[i].account;
             employeesTimestamps[i] = employees[i].joinTimestamp;
         }
 
         return (employeesAddresses, employeesTimestamps);
     }
 
-    function isEmployed(address addr) public view returns (bool) {
+    function isEmployed(address account) public view returns (bool) {
         for (uint256 i = 0; i < employees.length; i++) {
-            if (employees[i].addr == addr) {
+            if (employees[i].account == account) {
                 return true;
             }
         }
     }
 
-    function getEmployeeIndex(address addr)
+    function getEmployeeIndex(address account)
         internal
-        onlyEmployed(addr)
+        onlyEmployed(account)
+
         returns (uint256)
     {
         for (uint256 i = 0; i < employees.length; i++) {
-            if (employees[i].addr == addr) {
+            if (employees[i].account == account) {
                 return i;
             }
         }

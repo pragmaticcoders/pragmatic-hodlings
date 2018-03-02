@@ -156,7 +156,7 @@ contract('Holder', accounts => {
       assert.isOk(log);
       const event = log.args as EmployeeRegisteredEvent;
       assert.isOk(event);
-      assert.equal(event.addr, employee);
+      assert.equal(event.account, employee);
       assertNumberEqual(event.joinTimestamp, new BigNumber(employeeTimestamp));
     });
 
@@ -267,7 +267,7 @@ contract('Holder', accounts => {
       assert.isOk(log);
       const event = log.args as EmployeeFiredEvent;
       assert.isOk(event);
-      assert.equal(event.addr, employeeToFire);
+      assert.equal(event.account, employeeToFire);
     });
 
     it('Should revert if not owner', async () => {
