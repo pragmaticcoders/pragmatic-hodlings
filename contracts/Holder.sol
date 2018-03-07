@@ -65,6 +65,8 @@ contract PragmaticHodlings is Ownable {
      */
     event HodlerFired(address account);
 
+    event Echo(string msg, uint256 lol);
+
     /**
     * @dev Register new hodler
     * @param account address The hodler address
@@ -135,17 +137,21 @@ contract PragmaticHodlings is Ownable {
     {
         uint256[] memory tokenShares = new uint256[](hodlers.length);
 
-        uint256 daysSum = 0;
+        uint256 sum = 0;
         for (uint i = 0; i < hodlers.length; i++) {
             // solhint-disable-next-line not-rely-on-time
-            uint256 hodlerSeniority = now.sub(hodlers[i].joinTimestamp);
-            tokenShares[i] = hodlerSeniority.div(DAY_IN_SECONDS).add(1);
-            daysSum = daysSum.add(tokenShares[i]);
+            //todo consider overflow
+            tokenShares[i] = now.sub(hodlers[i].joinTimestamp);
+            sum = sum.add(tokenShares[i]);
         }
 
         for (i = 0; i < hodlers.length; i++) {
-            tokenShares[i] = amount.mul(tokenShares[i]).div(daysSum);
+            Echo("i", i);
+            Echo("res[i]", tokenShares[i]);
+            tokenShares[i] = amount.mul(tokenShares[i]).div(sum);
         }
+        Echo("sum", sum);
+        Echo("now", now);
 
         return tokenShares;
     }

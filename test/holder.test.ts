@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 
 import * as Web3 from 'web3';
+import { AnyNumber } from 'web3';
 
 import {
   HodlerFiredEvent,
@@ -13,7 +14,12 @@ import {
 
 import { BigNumber } from 'bignumber.js';
 import { ContractContextDefinition } from 'truffle';
-import { assertNumberEqual, assertReverts, findLastLog } from './helpers';
+import {
+  assertNumberEqual,
+  assertReverts,
+  findLastLog,
+  getNetworkTimestamp
+} from './helpers';
 
 declare const web3: Web3;
 declare const artifacts: HoldingsArtifacts;
@@ -21,6 +27,8 @@ declare const contract: ContractContextDefinition;
 
 const PragmaticHodlingsContract = artifacts.require('./PragmaticHodlings.sol');
 const TestTokenContract = artifacts.require('./TestToken.sol');
+
+const DAYS_IN_SECONDS = 86400;
 
 contract('PragmaticHodlings', accounts => {
   const owner = accounts[9];
@@ -42,30 +50,53 @@ contract('PragmaticHodlings', accounts => {
   });
 
   describe('#settleToken', () => {
-    const totalSupply = new BigNumber(1000000000);
-    const availableAmount = new BigNumber(1000000);
-    const transferAmount = new BigNumber(1000);
+    const tokenTotalSupply = new BigNumber(1000000000);
+    const tokenAvailableAmount = new BigNumber(1000000);
     let token: TestToken;
 
     beforeEach(async () => {
-      token = await TestTokenContract.new('PC Token', 'PC', totalSupply, {
+      token = await TestTokenContract.new('PC Token', 'PC', tokenTotalSupply, {
         from: owner
       });
-      await token.mint(owner, availableAmount, { from: owner });
-      assertNumberEqual(await token.balanceOf(owner), availableAmount);
+      await token.mint(owner, tokenAvailableAmount, { from: owner });
+      assertNumberEqual(await token.balanceOf(owner), tokenAvailableAmount);
     });
 
     context('after token transfer', () => {
+
+      const transferAmount = new BigNumber(1000);
+
       beforeEach(async () => {
-        await token.transfer(
-          hodlings.address,
-          transferAmount,
-          { from: owner }
-        );
-        assertNumberEqual(
-          await token.balanceOf(hodlings.address),
-          transferAmount
-        );
+        await setupAmountToSettle(transferAmount);
+      });
+
+      context('after hodler register', async () => {
+
+        beforeEach(async () => {
+          await hodlings.registerHodler(
+            accounts[1],
+            new BigNumber(100),
+            { from: owner }
+          );
+        });
+
+        it('should emit TokenSettled event', async () => {
+
+          const tx = await hodlings.settleToken(token.address, { from: owner });
+
+          const log = findLastLog(tx, 'TokenSettled');
+          assert.isOk(log);
+
+          const event = log.args as TokenSettledEvent;
+          assert.equal(event.token, token.address);
+          assertNumberEqual(event.amount, transferAmount);
+        });
+
+        it('should revert for non-owner', async () => {
+          await assertReverts(async () => {
+            await hodlings.settleToken(token.address, { from: nonOwner });
+          });
+        });
       });
 
       it('should revert for empty hodler list', async () => {
@@ -73,55 +104,41 @@ contract('PragmaticHodlings', accounts => {
           await hodlings.settleToken(token.address, { from: owner });
         });
       });
-
     });
 
-    context('after token transfer and dumb hodlers addition', () => {
-      const hodlersCount = 3;
+    it('should transfer the same amount', async () => {
+      const transferAmount = new BigNumber(100);
+      await setupAmountToSettle(transferAmount);
+      const hodlers: TestHodler[] = [
+        { address: accounts[1], workedSeconds: 100, expectedAmount: 100 },
+        { address: accounts[2], workedSeconds: 100, expectedAmount: 100 },
+      ];
 
-      beforeEach(async () => {
-        await token.transfer(
-          hodlings.address,
-          transferAmount,
-          { from: owner }
-        );
-        assertNumberEqual(
-          await token.balanceOf(hodlings.address),
-          transferAmount
-        );
+      await testSettlement(hodlers);
+    });
 
-        for (let i = 0; i < hodlersCount; i++) {
-          await hodlings.registerHodler(accounts[i], 100, { from: owner });
-        }
-      });
+    it.only('should transfer simple calculated proportions', async () => {
+      const transferAmount = new BigNumber(300);
+      await setupAmountToSettle(transferAmount);
 
-      it('should emit TokenSettled event', async () => {
-        const tx = await hodlings.settleToken(token.address, { from: owner });
+      /* tslint:disable:object-literal-sort-keys*/
+      const hodlers: TestHodler[] = [
+        {
+          address: accounts[1],
+          workedSeconds: 100,
+          expectedAmount: 100
+        },
+        {
+          address: accounts[2],
+          workedSeconds: 200,
+          expectedAmount: 200
+        },
+      ];
+      /* tslint:enable */
 
-        const log = findLastLog(tx, 'TokenSettled');
-        assert.isOk(log);
+      console.log(hodlers);
 
-        const event = log.args as TokenSettledEvent;
-        assert.equal(event.token, token.address);
-        assertNumberEqual(event.amount, transferAmount);
-      });
-
-      it('should transfer token shares to hodlers', async () => {
-        await hodlings.settleToken(token.address, { from: owner });
-
-        for (let i = 0; i < hodlersCount; i++) {
-          assertNumberEqual(
-            await token.balanceOf(accounts[i]),
-            transferAmount.div(hodlersCount).floor()
-          );
-        }
-      });
-
-      it('should revert for non-owner', async () => {
-        await assertReverts(async () => {
-          await hodlings.settleToken(token.address, { from: nonOwner });
-        });
-      });
+      await testSettlement(hodlers);
     });
 
     it('should revert if contract has no tokens', async () => {
@@ -131,6 +148,38 @@ contract('PragmaticHodlings', accounts => {
         await hodlings.settleToken(token.address, { from: owner });
       });
     });
+
+    async function setupAmountToSettle(amount: BigNumber) {
+      await token.transfer(
+        hodlings.address,
+        amount,
+        { from: owner }
+      );
+      assertNumberEqual(
+        await token.balanceOf(hodlings.address),
+        amount
+      );
+    }
+
+    async function testSettlement(hodlers: TestHodler[]) {
+      for (const hodler of hodlers) {
+        await hodlings.registerHodler(
+          hodler.address,
+          (await getNetworkTimestamp()) - hodler.workedSeconds,
+          { from: owner }
+        );
+      }
+
+      await hodlings.settleToken(token.address, { from: owner });
+
+      for (const hodler of hodlers) {
+        assertNumberEqual(
+          await token.balanceOf(hodler.address),
+          hodler.expectedAmount
+        );
+      }
+    }
+
   });
 
   describe('#registerHodler', () => {
@@ -294,7 +343,13 @@ contract('PragmaticHodlings', accounts => {
 
 interface Hodler {
   address: Address;
-  joinTimestamp: BigNumber;
+  joinTimestamp: AnyNumber;
+}
+
+interface TestHodler {
+  address: Address;
+  expectedAmount: number;
+  workedSeconds: number;
 }
 
 function parseHodlers(args: [Address[], BigNumber[]]): Hodler[] {
