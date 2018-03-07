@@ -59,7 +59,8 @@ contract('PragmaticHodlings', accounts => {
       beforeEach(async () => {
         await token.transfer(
           hodlings.address,
-          transferAmount, { from: owner }
+          transferAmount,
+          { from: owner }
         );
         assertNumberEqual(
           await token.balanceOf(hodlings.address),
@@ -72,9 +73,12 @@ contract('PragmaticHodlings', accounts => {
           await hodlings.settleToken(token.address, { from: owner });
         });
       });
+
     });
 
-    context('after token transfer and hodlers addition', () => {
+    context('after token transfer and dumb hodlers addition', () => {
+      const hodlersCount = 3;
+
       beforeEach(async () => {
         await token.transfer(
           hodlings.address,
@@ -86,9 +90,9 @@ contract('PragmaticHodlings', accounts => {
           transferAmount
         );
 
-        await hodlings.registerHodler(accounts[1], 100, { from: owner });
-        await hodlings.registerHodler(accounts[2], 100, { from: owner });
-        await hodlings.registerHodler(accounts[3], 100, { from: owner });
+        for (let i = 0; i < hodlersCount; i++) {
+          await hodlings.registerHodler(accounts[i], 100, { from: owner });
+        }
       });
 
       it('should emit TokenSettled event', async () => {
@@ -105,18 +109,12 @@ contract('PragmaticHodlings', accounts => {
       it('should transfer token shares to hodlers', async () => {
         await hodlings.settleToken(token.address, { from: owner });
 
-        assertNumberEqual(
-          await token.balanceOf(accounts[1]),
-          transferAmount.div(3).floor()
-        );
-        assertNumberEqual(
-          await token.balanceOf(accounts[2]),
-          transferAmount.div(3).floor()
-        );
-        assertNumberEqual(
-          await token.balanceOf(accounts[3]),
-          transferAmount.div(3).floor()
-        );
+        for (let i = 0; i < hodlersCount; i++) {
+          assertNumberEqual(
+            await token.balanceOf(accounts[i]),
+            transferAmount.div(hodlersCount).floor()
+          );
+        }
       });
 
       it('should revert for non-owner', async () => {
@@ -126,9 +124,8 @@ contract('PragmaticHodlings', accounts => {
       });
     });
 
-    it('should revert for insufficient token amount', async () => {
+    it('should revert if contract has no tokens', async () => {
       await hodlings.registerHodler(accounts[1], 100, { from: owner });
-      await hodlings.registerHodler(accounts[2], 100, { from: owner });
 
       await assertReverts(async () => {
         await hodlings.settleToken(token.address, { from: owner });
