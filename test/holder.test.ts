@@ -109,34 +109,69 @@ contract('PragmaticHodlings', accounts => {
     it('should transfer the same amount', async () => {
       const transferAmount = new BigNumber(100);
       await setupAmountToSettle(transferAmount);
+
       const hodlers: TestHodler[] = [
-        { address: accounts[1], workedSeconds: 100, expectedAmount: 100 },
-        { address: accounts[2], workedSeconds: 100, expectedAmount: 100 },
+        { address: accounts[1], workedSeconds: 100, expectedAmount: 50 },
+        { address: accounts[2], workedSeconds: 100, expectedAmount: 50 },
       ];
 
       await testSettlement(hodlers);
     });
 
     it.only('should transfer simple calculated proportions', async () => {
-      const transferAmount = new BigNumber(300);
+      const transferAmount = new BigNumber(2000);
       await setupAmountToSettle(transferAmount);
 
-      /* tslint:disable:object-literal-sort-keys*/
       const hodlers: TestHodler[] = [
-        {
-          address: accounts[1],
-          workedSeconds: 100,
-          expectedAmount: 100
-        },
-        {
-          address: accounts[2],
-          workedSeconds: 200,
-          expectedAmount: 200
-        },
+        { address: accounts[1], workedSeconds: 1000, expectedAmount: 1000 },
+        { address: accounts[2], workedSeconds: 800, expectedAmount: 800 },
+        { address: accounts[3], workedSeconds: 200, expectedAmount: 200 },
       ];
-      /* tslint:enable */
 
-      console.log(hodlers);
+      await testSettlement(hodlers);
+    });
+
+    it.only('should transfer simple calculated proportions with new hodler', async () => {
+      const transferAmount = new BigNumber(2000);
+      await setupAmountToSettle(transferAmount);
+
+      const hodlers: TestHodler[] = [
+        { address: accounts[1], workedSeconds: 1100, expectedAmount: 916 },
+        { address: accounts[2], workedSeconds: 900, expectedAmount: 750 },
+        { address: accounts[3], workedSeconds: 300, expectedAmount: 250 },
+        { address: accounts[4], workedSeconds: 100, expectedAmount: 83 },
+      ];
+
+      await testSettlement(hodlers);
+    });
+
+    it.only('should transfer simple calculated proportions after delete hodler', async () => {
+      const transferAmount = new BigNumber(2000);
+      await setupAmountToSettle(transferAmount);
+
+      const hodlers: TestHodler[] = [
+        { address: accounts[1], workedSeconds: 1000, expectedAmount: 1111 },
+        { address: accounts[2], workedSeconds: 800, expectedAmount: 888 },
+      ];
+
+      await testSettlement(hodlers);
+    });
+
+    it.skip('should transfer proportions for real data', async () => {
+      const transferAmount = new BigNumber(100000);
+      await setupAmountToSettle(transferAmount);
+
+      const hodlers: TestHodler[] = [
+        { address: accounts[1], workedSeconds: 1000, expectedAmount: 1000 },
+        { address: accounts[2], workedSeconds: 1000, expectedAmount: 1000 },
+        { address: accounts[3], workedSeconds: 1000, expectedAmount: 1000 },
+        { address: accounts[4], workedSeconds: 1000, expectedAmount: 1000 },
+        { address: accounts[5], workedSeconds: 1000, expectedAmount: 1000 },
+        { address: accounts[6], workedSeconds: 1000, expectedAmount: 1000 },
+        { address: accounts[7], workedSeconds: 800, expectedAmount: 800 },
+        { address: accounts[8], workedSeconds: 200, expectedAmount: 200 },
+        { address: accounts[9], workedSeconds: 200, expectedAmount: 200 },
+      ];
 
       await testSettlement(hodlers);
     });
@@ -162,10 +197,12 @@ contract('PragmaticHodlings', accounts => {
     }
 
     async function testSettlement(hodlers: TestHodler[]) {
+      const currentTimestamp = await getNetworkTimestamp();
+
       for (const hodler of hodlers) {
         await hodlings.registerHodler(
           hodler.address,
-          (await getNetworkTimestamp()) - hodler.workedSeconds,
+          currentTimestamp - hodler.workedSeconds,
           { from: owner }
         );
       }
