@@ -12,7 +12,8 @@
     "lint:tslint": "tslint --project .",
     "lint:tslint:fix": "tslint --fix --project .",
     "lint:solhint": "solhint \"contracts/**/*.sol\" \"build/flat/*.sol\"",
-    "format": "prettier --write \"**/*.ts\""
+    "format": "prettier --write \"**/*.ts\"",
+    "alg:constant": "npm run compile:ts && truffle exec scripts/algorithm.script.js --network testrpc"
   },
   "repository": {
     "type": "git",

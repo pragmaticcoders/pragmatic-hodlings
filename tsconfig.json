@@ -11,6 +11,7 @@
   "include": [
     "migrations/**/*.ts",
     "test/**/*.ts",
+    "scripts/**/*.ts",
     "truffle-config.ts",
     "types/**/*.ts",
     "utils/**/*.ts"

@@ -29,8 +29,6 @@ declare const contract: ContractContextDefinition;
 const PragmaticHodlingsContract = artifacts.require('./PragmaticHodlings.sol');
 const TestTokenContract = artifacts.require('./TestToken.sol');
 
-const DAYS_IN_SECONDS = 86400;
-
 contract('PragmaticHodlings', accounts => {
   const owner = accounts[9];
   const nonOwner = accounts[8];
@@ -153,46 +151,6 @@ contract('PragmaticHodlings', accounts => {
       const hodlers: TestHodler[] = [
         new TestHodler(1000, 1111),
         new TestHodler(800, 888),
-      ];
-
-      await testSettlement(hodlers);
-    });
-
-    it.skip('should transfer proportions for real data', async () => {
-      const transferAmount = new BigNumber(1000);
-      await setupAmountToSettle(transferAmount);
-
-      const hodlers: TestHodler[] = [
-        new TestHodler(1500 * DAYS_IN_SECONDS, 1500),
-        new TestHodler(1450 * DAYS_IN_SECONDS, 1450),
-        new TestHodler(1300 * DAYS_IN_SECONDS, 1300),
-        new TestHodler(1250 * DAYS_IN_SECONDS, 1250),
-        new TestHodler(1200 * DAYS_IN_SECONDS, 1200),
-        new TestHodler(1150 * DAYS_IN_SECONDS, 1150),
-        new TestHodler(1100 * DAYS_IN_SECONDS, 1100),
-        new TestHodler(1050 * DAYS_IN_SECONDS, 1050),
-        new TestHodler(1000 * DAYS_IN_SECONDS, 1000),
-        new TestHodler(950 * DAYS_IN_SECONDS, 950),
-        // sum days 12250
-
-        new TestHodler(900 * DAYS_IN_SECONDS, 900),
-        new TestHodler(850 * DAYS_IN_SECONDS, 850),
-        new TestHodler(750 * DAYS_IN_SECONDS, 750),
-        new TestHodler(700 * DAYS_IN_SECONDS, 700),
-        new TestHodler(650 * DAYS_IN_SECONDS, 650),
-        new TestHodler(600 * DAYS_IN_SECONDS, 600),
-        new TestHodler(550 * DAYS_IN_SECONDS, 550),
-        new TestHodler(500 * DAYS_IN_SECONDS, 500),
-        new TestHodler(450 * DAYS_IN_SECONDS, 450),
-        new TestHodler(400 * DAYS_IN_SECONDS, 400),
-
-        new TestHodler(350 * DAYS_IN_SECONDS, 350),
-        new TestHodler(300 * DAYS_IN_SECONDS, 300),
-        new TestHodler(250 * DAYS_IN_SECONDS, 250),
-        new TestHodler(200 * DAYS_IN_SECONDS, 200),
-        new TestHodler(150 * DAYS_IN_SECONDS, 150),
-        new TestHodler(100 * DAYS_IN_SECONDS, 100),
-        new TestHodler(50 * DAYS_IN_SECONDS, 50),
       ];
 
       await testSettlement(hodlers);
