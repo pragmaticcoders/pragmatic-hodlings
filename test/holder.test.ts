@@ -6,7 +6,7 @@ import { AnyNumber } from 'web3';
 import {
   HodlerFiredEvent,
   HodlerRegisteredEvent,
-  HoldingsArtifacts,
+  HodlingsArtifacts,
   PragmaticHodlings,
   TestToken,
   TokenSettledEvent
@@ -15,6 +15,7 @@ import {
 import { BigNumber } from 'bignumber.js';
 import { ContractContextDefinition } from 'truffle';
 import {
+  assertNumberAlmostEqual,
   assertNumberEqual,
   assertReverts,
   findLastLog,
@@ -22,7 +23,7 @@ import {
 } from './helpers';
 
 declare const web3: Web3;
-declare const artifacts: HoldingsArtifacts;
+declare const artifacts: HodlingsArtifacts;
 declare const contract: ContractContextDefinition;
 
 const PragmaticHodlingsContract = artifacts.require('./PragmaticHodlings.sol');
@@ -111,66 +112,87 @@ contract('PragmaticHodlings', accounts => {
       await setupAmountToSettle(transferAmount);
 
       const hodlers: TestHodler[] = [
-        { address: accounts[1], workedSeconds: 100, expectedAmount: 50 },
-        { address: accounts[2], workedSeconds: 100, expectedAmount: 50 },
+        new TestHodler(100, 50),
+        new TestHodler(100, 50),
       ];
 
       await testSettlement(hodlers);
     });
 
-    it.only('should transfer simple calculated proportions', async () => {
+    it('should transfer simple calculated proportions', async () => {
       const transferAmount = new BigNumber(2000);
       await setupAmountToSettle(transferAmount);
 
       const hodlers: TestHodler[] = [
-        { address: accounts[1], workedSeconds: 1000, expectedAmount: 1000 },
-        { address: accounts[2], workedSeconds: 800, expectedAmount: 800 },
-        { address: accounts[3], workedSeconds: 200, expectedAmount: 200 },
+        new TestHodler(1000, 1000),
+        new TestHodler(800, 800),
+        new TestHodler(200, 200)
       ];
 
       await testSettlement(hodlers);
     });
 
-    it.only('should transfer simple calculated proportions with new hodler', async () => {
+    it('should transfer simple calculated proportions with new hodler', async () => {
       const transferAmount = new BigNumber(2000);
       await setupAmountToSettle(transferAmount);
 
       const hodlers: TestHodler[] = [
-        { address: accounts[1], workedSeconds: 1100, expectedAmount: 916 },
-        { address: accounts[2], workedSeconds: 900, expectedAmount: 750 },
-        { address: accounts[3], workedSeconds: 300, expectedAmount: 250 },
-        { address: accounts[4], workedSeconds: 100, expectedAmount: 83 },
+        new TestHodler(1100, 916),
+        new TestHodler(900, 750),
+        new TestHodler(300, 250),
+        new TestHodler(100, 83),
       ];
 
       await testSettlement(hodlers);
     });
 
-    it.only('should transfer simple calculated proportions after delete hodler', async () => {
+    it('should transfer simple calculated proportions after delete hodler', async () => {
       const transferAmount = new BigNumber(2000);
       await setupAmountToSettle(transferAmount);
 
       const hodlers: TestHodler[] = [
-        { address: accounts[1], workedSeconds: 1000, expectedAmount: 1111 },
-        { address: accounts[2], workedSeconds: 800, expectedAmount: 888 },
+        new TestHodler(1000, 1111),
+        new TestHodler(800, 888),
       ];
 
       await testSettlement(hodlers);
     });
 
     it.skip('should transfer proportions for real data', async () => {
-      const transferAmount = new BigNumber(100000);
+      const transferAmount = new BigNumber(1000);
       await setupAmountToSettle(transferAmount);
 
       const hodlers: TestHodler[] = [
-        { address: accounts[1], workedSeconds: 1000, expectedAmount: 1000 },
-        { address: accounts[2], workedSeconds: 1000, expectedAmount: 1000 },
-        { address: accounts[3], workedSeconds: 1000, expectedAmount: 1000 },
-        { address: accounts[4], workedSeconds: 1000, expectedAmount: 1000 },
-        { address: accounts[5], workedSeconds: 1000, expectedAmount: 1000 },
-        { address: accounts[6], workedSeconds: 1000, expectedAmount: 1000 },
-        { address: accounts[7], workedSeconds: 800, expectedAmount: 800 },
-        { address: accounts[8], workedSeconds: 200, expectedAmount: 200 },
-        { address: accounts[9], workedSeconds: 200, expectedAmount: 200 },
+        new TestHodler(1500 * DAYS_IN_SECONDS, 1500),
+        new TestHodler(1450 * DAYS_IN_SECONDS, 1450),
+        new TestHodler(1300 * DAYS_IN_SECONDS, 1300),
+        new TestHodler(1250 * DAYS_IN_SECONDS, 1250),
+        new TestHodler(1200 * DAYS_IN_SECONDS, 1200),
+        new TestHodler(1150 * DAYS_IN_SECONDS, 1150),
+        new TestHodler(1100 * DAYS_IN_SECONDS, 1100),
+        new TestHodler(1050 * DAYS_IN_SECONDS, 1050),
+        new TestHodler(1000 * DAYS_IN_SECONDS, 1000),
+        new TestHodler(950 * DAYS_IN_SECONDS, 950),
+        // sum days 12250
+
+        new TestHodler(900 * DAYS_IN_SECONDS, 900),
+        new TestHodler(850 * DAYS_IN_SECONDS, 850),
+        new TestHodler(750 * DAYS_IN_SECONDS, 750),
+        new TestHodler(700 * DAYS_IN_SECONDS, 700),
+        new TestHodler(650 * DAYS_IN_SECONDS, 650),
+        new TestHodler(600 * DAYS_IN_SECONDS, 600),
+        new TestHodler(550 * DAYS_IN_SECONDS, 550),
+        new TestHodler(500 * DAYS_IN_SECONDS, 500),
+        new TestHodler(450 * DAYS_IN_SECONDS, 450),
+        new TestHodler(400 * DAYS_IN_SECONDS, 400),
+
+        new TestHodler(350 * DAYS_IN_SECONDS, 350),
+        new TestHodler(300 * DAYS_IN_SECONDS, 300),
+        new TestHodler(250 * DAYS_IN_SECONDS, 250),
+        new TestHodler(200 * DAYS_IN_SECONDS, 200),
+        new TestHodler(150 * DAYS_IN_SECONDS, 150),
+        new TestHodler(100 * DAYS_IN_SECONDS, 100),
+        new TestHodler(50 * DAYS_IN_SECONDS, 50),
       ];
 
       await testSettlement(hodlers);
@@ -197,11 +219,16 @@ contract('PragmaticHodlings', accounts => {
     }
 
     async function testSettlement(hodlers: TestHodler[]) {
+
+      if (hodlers.length > accounts.length) {
+        throw new Error('Too many hodlers.');
+      }
+
       const currentTimestamp = await getNetworkTimestamp();
 
-      for (const hodler of hodlers) {
+      for (const [idx, hodler] of hodlers.entries()) {
         await hodlings.registerHodler(
-          hodler.address,
+          accounts[idx],
           currentTimestamp - hodler.workedSeconds,
           { from: owner }
         );
@@ -209,14 +236,14 @@ contract('PragmaticHodlings', accounts => {
 
       await hodlings.settleToken(token.address, { from: owner });
 
-      for (const hodler of hodlers) {
-        assertNumberEqual(
-          await token.balanceOf(hodler.address),
-          hodler.expectedAmount
+      for (const [idx, hodler] of hodlers.entries()) {
+        assertNumberAlmostEqual(
+          await token.balanceOf(accounts[idx]),
+          hodler.expectedAmount,
+          1
         );
       }
     }
-
   });
 
   describe('#registerHodler', () => {
@@ -383,10 +410,13 @@ interface Hodler {
   joinTimestamp: AnyNumber;
 }
 
-interface TestHodler {
-  address: Address;
-  expectedAmount: number;
-  workedSeconds: number;
+class TestHodler {
+  constructor(
+    public workedSeconds: number,
+    public expectedAmount: number
+  ) {
+
+  }
 }
 
 function parseHodlers(args: [Address[], BigNumber[]]): Hodler[] {

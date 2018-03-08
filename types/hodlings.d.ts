@@ -122,7 +122,7 @@ declare module 'hodlings' {
       'new'(options?: TransactionOptions): Promise<PragmaticHodlings>;
     }
 
-    interface HoldingsArtifacts extends TruffleArtifacts {
+    interface HodlingsArtifacts extends TruffleArtifacts {
       require(name: string): AnyContract;
       require(name: './Migrations.sol'): MigrationsContract;
       require(name: './TestToken.sol'): TestTokenContract;
