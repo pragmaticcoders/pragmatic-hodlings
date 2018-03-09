@@ -1,6 +1,7 @@
 import { ScriptFinalizer } from 'truffle';
 
 import { BigNumber } from 'bignumber.js';
+import * as fs from 'fs';
 import { HodlingsArtifacts, PragmaticHodlings, TestToken } from 'hodlings';
 import * as Web3 from 'web3';
 
@@ -23,15 +24,34 @@ async function asyncExec() {
     350, 300, 250, 200, 150, 100, 50, 0
   ];
 
+  const chartData: number[][] = [];
+
   for (let timeShiftDays = 0; timeShiftDays <= 120; timeShiftDays += 30) {
-    await setupAndCalculate(hodlersWorkedDays, timeShiftDays);
+    const csvRowData: number[] =
+      await setupAndCalculate(hodlersWorkedDays, timeShiftDays);
+    chartData.push([timeShiftDays, ...csvRowData]);
   }
+
+  const stream = fs.createWriteStream(
+    `./scripts/outputs/alg_constant.csv`,
+    { flags: 'a' }
+  );
+  const columnNames = ('days' +
+    hodlersWorkedDays.reduce((acc, item) => `${acc},${item}`, '') +
+    '\n'
+  );
+  stream.write(columnNames);
+  chartData.forEach(row => {
+    const parsedRow = row.join(',') + '\n';
+    stream.write(parsedRow);
+  });
+  stream.end();
 }
 
 async function setupAndCalculate(
   hodlersWorkedDays: number[],
-  timeShiftDays: number
-) {
+  timeShiftDays: number,
+): Promise<number[]> {
   const hodlings = await PragmaticHodlingsContract.new({ from: owner });
   const token = await TestTokenContract.new(
     'PC Token',
@@ -42,7 +62,7 @@ async function setupAndCalculate(
   await token.mint(owner, tokenSupply, { from: owner });
   await token.transfer(hodlings.address, tokenSupply, { from: owner });
 
-  await calculate(hodlings, token, hodlersWorkedDays, timeShiftDays);
+  return await calculate(hodlings, token, hodlersWorkedDays, timeShiftDays);
 }
 
 async function calculate(
@@ -50,7 +70,7 @@ async function calculate(
   token: TestToken,
   hodlersWorkDuration: number[],
   timeShiftDays: number,
-) {
+): Promise<number[]> {
   const currentTimestamp = Math.floor(Date.now() / 1000);
 
   for (const [idx, hodlerWorkDuration] of hodlersWorkDuration.entries()) {
@@ -61,13 +81,14 @@ async function calculate(
     );
   }
 
+  const data: number[] = new Array<number>(hodlersWorkDuration.length);
   await hodlings.settleToken(token.address, { from: owner });
 
-  console.log(`--------------------------Timeshift ${timeShiftDays} days--------------------------`);
   for (const [idx] of hodlersWorkDuration.entries()) {
     const hodlerBalance = await token.balanceOf(numberToAddress(idx));
-    console.log(idx, hodlerBalance.toNumber());
+    data[idx] = hodlerBalance.toNumber();
   }
+  return data;
 }
 
 function numberToAddress(val: number): Address {
