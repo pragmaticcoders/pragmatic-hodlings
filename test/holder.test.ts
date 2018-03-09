@@ -4,8 +4,8 @@ import * as Web3 from 'web3';
 import { AnyNumber } from 'web3';
 
 import {
-  HodlerFiredEvent,
-  HodlerRegisteredEvent,
+  HodlerAddedEvent,
+  HodlerRemovedEvent,
   HodlingsArtifacts,
   PragmaticHodlings,
   TestToken,
@@ -70,7 +70,7 @@ contract('PragmaticHodlings', accounts => {
 
       context('after hodler register', async () => {
         beforeEach(async () => {
-          await hodlings.registerHodler(
+          await hodlings.addHodler(
             accounts[1],
             new BigNumber(100),
             { from: owner }
@@ -157,7 +157,7 @@ contract('PragmaticHodlings', accounts => {
       });
 
     it('should revert if contract has no tokens', async () => {
-      await hodlings.registerHodler(accounts[1], 100, { from: owner });
+      await hodlings.addHodler(accounts[1], 100, { from: owner });
 
       await assertReverts(async () => {
         await hodlings.settleToken(token.address, { from: owner });
@@ -184,7 +184,7 @@ contract('PragmaticHodlings', accounts => {
       const currentTimestamp = await getNetworkTimestamp();
 
       for (const [idx, hodler] of hodlers.entries()) {
-        await hodlings.registerHodler(
+        await hodlings.addHodler(
           accounts[idx],
           currentTimestamp - hodler.workedSeconds,
           { from: owner }
@@ -203,97 +203,82 @@ contract('PragmaticHodlings', accounts => {
     }
   });
 
-  describe('#registerHodler', () => {
+  describe('#addHodler', () => {
     it('Should add one hodler', async () => {
       const hodler = accounts[1];
       const hodlerTimestamp = 100;
-      await hodlings.registerHodler(
+      await hodlings.addHodler(
         hodler,
         hodlerTimestamp,
         { from: owner }
       );
 
-      const currentHodlers: Hodler[] =
-        parseHodlers(await hodlings.getHodlers());
+      const currentHodlers: Hodler[] = parseHodlers(
+        await hodlings.getHodlers()
+      );
       assertNumberEqual(currentHodlers.length, 1);
       assert.equal(currentHodlers[0].address, hodler);
       assertNumberEqual(currentHodlers[0].joinTimestamp, hodlerTimestamp);
     });
 
-    it('Should emit HodlerRegistered event', async () => {
+    it('Should emit HodlerAdded event', async () => {
       const hodler = accounts[1];
       const hodlerTimestamp = 100;
-      const registerTx =
-        await hodlings.registerHodler(
-          hodler,
-          hodlerTimestamp,
-          { from: owner }
-        );
+      const addTx = await hodlings.addHodler(
+        hodler,
+        hodlerTimestamp,
+        { from: owner }
+      );
 
-      const log = findLastLog(registerTx, 'HodlerRegistered');
+      const log = findLastLog(addTx, 'HodlerAdded');
       assert.isOk(log);
-      const event = log.args as HodlerRegisteredEvent;
+      const event = log.args as HodlerAddedEvent;
       assert.isOk(event);
       assert.equal(event.account, hodler);
       assertNumberEqual(event.joinTimestamp, new BigNumber(hodlerTimestamp));
     });
 
     it('Should add few hodlers', async () => {
-      const hodlers: Hodler[] =
-        accounts.map(
-          (address, idx): Hodler => ({
-            address,
-            joinTimestamp: new BigNumber(idx).add(1)
-          }));
+      const hodlers: Hodler[] = accounts.map((address, idx): Hodler => ({
+        address,
+        joinTimestamp: new BigNumber(idx).add(1)
+      }));
 
-      await hodlers.forEach(async (hodler) => {
-        await hodlings.registerHodler(
-          hodler.address,
-          hodler.joinTimestamp,
-          { from: owner }
-        );
+      await hodlers.forEach(async hodler => {
+        await hodlings.addHodler(hodler.address, hodler.joinTimestamp, {
+          from: owner
+        });
       });
 
-      const registeredHodlers: Hodler[] = parseHodlers(
+      const addedHodlers: Hodler[] = parseHodlers(
         await hodlings.getHodlers()
       );
 
-      assertNumberEqual(registeredHodlers.length, hodlers.length);
+      assertNumberEqual(addedHodlers.length, hodlers.length);
 
-      hodlers.forEach((hodler) => {
-        const registered =
-          registeredHodlers.find((item) => item.address === hodler.address);
+      hodlers.forEach(hodler => {
+        const added = addedHodlers.find(
+          item => item.address === hodler.address
+        );
 
-        assert.isOk(registered);
-        assertNumberEqual(registered!.joinTimestamp, hodler.joinTimestamp);
+        assert.isOk(added);
+        assertNumberEqual(added!.joinTimestamp, hodler.joinTimestamp);
       });
     });
 
     it('Should revert if not owner', async () => {
       await assertReverts(async () => {
-        await hodlings.registerHodler(
-          accounts[1],
-          100,
-          { from: nonOwner }
-        );
+        await hodlings.addHodler(accounts[1], 100, { from: nonOwner });
       });
     });
 
     it('Should revert if already exists', async () => {
       const hodler = accounts[1];
       const hodlerTimestamp = 100;
-      await hodlings.registerHodler(
-        hodler,
-        hodlerTimestamp,
-        { from: owner }
-      );
+      await hodlings.addHodler(hodler, hodlerTimestamp, { from: owner });
 
       await assertReverts(async () => {
-        await hodlings.registerHodler(
-          hodler,
-          hodlerTimestamp,
-          { from: owner }
-        );
+        await hodlings.addHodler(hodler, hodlerTimestamp, { from: owner });
       });
     });
 
@@ -302,7 +287,7 @@ contract('PragmaticHodlings', accounts => {
       const hodlerTimestamp = Math.floor(Date.now() / 1000) + 1000;
 
       await assertReverts(async () => {
-        await hodlings.registerHodler(
+        await hodlings.addHodler(
           hodler,
           hodlerTimestamp,
           { from: owner }
@@ -314,11 +299,9 @@ contract('PragmaticHodlings', accounts => {
   describe('#removeHodler', () => {
     beforeEach(async () => {
       await accounts.forEach(async (account, idx) => {
-        await hodlings.registerHodler(
-          account,
-          new BigNumber(idx).add(1),
-          { from: owner }
-        );
+        await hodlings.addHodler(account, new BigNumber(idx).add(1), {
+          from: owner
+        });
       });
 
       assertNumberEqual(
@@ -331,45 +314,45 @@ contract('PragmaticHodlings', accounts => {
       const hodlerToFire = accounts[2];
       assert.isTrue(await hodlings.isHodler(hodlerToFire));
 
-      await hodlings.fireHodler(hodlerToFire, { from: owner });
+      await hodlings.removeHodler(hodlerToFire, { from: owner });
 
       assert.isFalse(await hodlings.isHodler(hodlerToFire));
 
-      const currentHodlers: Hodler[] =
-        parseHodlers(await hodlings.getHodlers());
+      const currentHodlers: Hodler[] = parseHodlers(
+        await hodlings.getHodlers()
+      );
       assert.equal(currentHodlers.length, accounts.length - 1);
       assert.isNotOk(
         currentHodlers.find(hodler => hodler.address === hodlerToFire)
       );
     });
 
-    it('Should emit HodlerFired event', async () => {
+    it('Should emit HodlerRemoved event', async () => {
       const hodlerToFire = accounts[2];
       assert.isTrue(await hodlings.isHodler(hodlerToFire));
 
-      const fireTx =
-        await hodlings.fireHodler(hodlerToFire, { from: owner });
+      const removeTx = await hodlings.removeHodler(hodlerToFire, { from: owner });
 
-      const log = findLastLog(fireTx, 'HodlerFired');
+      const log = findLastLog(removeTx, 'HodlerRemoved');
       assert.isOk(log);
-      const event = log.args as HodlerFiredEvent;
+      const event = log.args as HodlerRemovedEvent;
       assert.isOk(event);
       assert.equal(event.account, hodlerToFire);
     });
 
     it('Should revert if not owner', async () => {
       await assertReverts(async () => {
-        await hodlings.fireHodler(accounts[2], { from: nonOwner });
+        await hodlings.removeHodler(accounts[2], { from: nonOwner });
       });
     });
 
     it('Should revert if is not holder', async () => {
       const hodlerToFire = accounts[2];
-      await hodlings.fireHodler(hodlerToFire, { from: owner });
+      await hodlings.removeHodler(hodlerToFire, { from: owner });
       assert.isFalse(await hodlings.isHodler(hodlerToFire));
 
       await assertReverts(async () => {
-        await hodlings.fireHodler(hodlerToFire, { from: owner });
+        await hodlings.removeHodler(hodlerToFire, { from: owner });
       });
     });
   });

@@ -74,7 +74,7 @@ async function calculate(
   const currentTimestamp = Math.floor(Date.now() / 1000);
 
   for (const [idx, hodlerWorkDuration] of hodlersWorkDuration.entries()) {
-    await hodlings.registerHodler(
+    await hodlings.addHodler(
       numberToAddress(idx),
       currentTimestamp - (timeShiftDays + hodlerWorkDuration) * DAYS_IN_SECONDS,
       { from: owner }
