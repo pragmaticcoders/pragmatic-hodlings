@@ -62,7 +62,6 @@ contract('PragmaticHodlings', accounts => {
     });
 
     context('after token transfer', () => {
-
       const transferAmount = new BigNumber(1000);
 
       beforeEach(async () => {
@@ -70,7 +69,6 @@ contract('PragmaticHodlings', accounts => {
       });
 
       context('after hodler register', async () => {
-
         beforeEach(async () => {
           await hodlings.registerHodler(
             accounts[1],
@@ -80,12 +78,10 @@ contract('PragmaticHodlings', accounts => {
         });
 
         it('should emit TokenSettled event', async () => {
-
           const tx = await hodlings.settleToken(token.address, { from: owner });
 
           const log = findLastLog(tx, 'TokenSettled');
           assert.isOk(log);
-
           const event = log.args as TokenSettledEvent;
           assert.equal(event.token, token.address);
           assertNumberEqual(event.amount, transferAmount);
@@ -181,7 +177,6 @@ contract('PragmaticHodlings', accounts => {
     }
 
     async function testSettlement(hodlers: TestHodler[]) {
-
       if (hodlers.length > accounts.length) {
         throw new Error('Too many hodlers.');
       }
@@ -259,8 +254,9 @@ contract('PragmaticHodlings', accounts => {
         );
       });
 
-      const registeredHodlers: Hodler[] =
-        parseHodlers(await hodlings.getHodlers());
+      const registeredHodlers: Hodler[] = parseHodlers(
+        await hodlings.getHodlers()
+      );
 
       assertNumberEqual(registeredHodlers.length, hodlers.length);
 
@@ -302,8 +298,7 @@ contract('PragmaticHodlings', accounts => {
     });
   });
 
-  describe('#fireHodler', () => {
-
+  describe('#removeHodler', () => {
     beforeEach(async () => {
       await accounts.forEach(async (account, idx) => {
         await hodlings.registerHodler(
