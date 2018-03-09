@@ -296,6 +296,19 @@ contract('PragmaticHodlings', accounts => {
         );
       });
     });
+
+    it('Should revert if join timestamp is future', async () => {
+      const hodler = accounts[1];
+      const hodlerTimestamp = Math.floor(Date.now() / 1000) + 1000;
+
+      await assertReverts(async () => {
+        await hodlings.registerHodler(
+          hodler,
+          hodlerTimestamp,
+          { from: owner }
+        );
+      });
+    });
   });
 
   describe('#removeHodler', () => {
