@@ -87,9 +87,7 @@ declare module 'hodlings' {
 
       getHodlers(): Promise<[Address[], BigNumber[]]>;
 
-      isHodler(
-          account: Address
-      ): Promise<boolean>;
+      isHodler(account: Address): Promise<boolean>;
     }
 
     interface HodlerAddedEvent {

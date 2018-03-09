@@ -49,6 +49,7 @@ contract PragmaticHodlings is Ownable {
     }
 
     modifier onlyPast(uint32 timestamp) {
+        // solhint-disable-next-line not-rely-on-time
         require(now > timestamp);
         _;
     }

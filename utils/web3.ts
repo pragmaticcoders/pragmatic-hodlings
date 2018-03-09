@@ -1,8 +1,8 @@
 import { BigNumber } from 'bignumber.js';
 import * as Web3 from 'web3';
 
-import { promisify } from './common';
 import { AbstractBlock } from 'web3';
+import { promisify } from './common';
 
 export class Web3Utils {
   constructor(private web3: Web3) {}

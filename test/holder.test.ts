@@ -224,11 +224,9 @@ contract('PragmaticHodlings', accounts => {
     it('Should emit HodlerAdded event', async () => {
       const hodler = accounts[1];
       const hodlerTimestamp = 100;
-      const addTx = await hodlings.addHodler(
-        hodler,
-        hodlerTimestamp,
-        { from: owner }
-      );
+      const addTx = await hodlings.addHodler(hodler, hodlerTimestamp, {
+        from: owner
+      });
 
       const log = findLastLog(addTx, 'HodlerAdded');
       assert.isOk(log);
@@ -250,9 +248,7 @@ contract('PragmaticHodlings', accounts => {
         });
       });
 
-      const addedHodlers: Hodler[] = parseHodlers(
-        await hodlings.getHodlers()
-      );
+      const addedHodlers: Hodler[] = parseHodlers(await hodlings.getHodlers());
 
       assertNumberEqual(addedHodlers.length, hodlers.length);
 
@@ -331,7 +327,9 @@ contract('PragmaticHodlings', accounts => {
       const hodlerToFire = accounts[2];
       assert.isTrue(await hodlings.isHodler(hodlerToFire));
 
-      const removeTx = await hodlings.removeHodler(hodlerToFire, { from: owner });
+      const removeTx = await hodlings.removeHodler(hodlerToFire, {
+        from: owner
+      });
 
       const log = findLastLog(removeTx, 'HodlerRemoved');
       assert.isOk(log);

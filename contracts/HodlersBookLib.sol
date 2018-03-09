@@ -19,8 +19,7 @@ library HodlersBookLib {
     }
 
     /**
-     * @dev Represents hodler with its address and
-     * @dev and joining to organization timestamp
+     * @dev Represents set of hodlers
      */
     struct HodlersBook {
         Hodler[] entries;
@@ -39,7 +38,7 @@ library HodlersBookLib {
         internal
         returns (bool)
     {
-        if (contains(self, account)) {
+        if (account == address(0) || contains(self, account)) {
             return false;
         }
 
@@ -63,11 +62,10 @@ library HodlersBookLib {
         internal
         returns (bool)
     {
-        if (!contains(self, account)) { // not existing
+        if (!contains(self, account)) {
             return false;
         } else {
             uint256 entryIndex = index(self, account);
-            // first or in the middle
             if (entryIndex < self.entries.length - 1) {
                 self.entries[entryIndex] = self.entries[self.entries.length - 1];
             }
@@ -79,16 +77,9 @@ library HodlersBookLib {
     }
 
     /**
-     * @dev Clears out book
-     */
-    function clear(HodlersBook storage self) internal {
-        delete self.entries;
-    }
-
-    /**
      * @dev Checks if hodler address exists in book
      * @param account address Address to check
-     * @return Address existence indicator
+     * @return bool Address existence indicator
      */
     function contains(
         HodlersBook storage self,
@@ -107,7 +98,7 @@ library HodlersBookLib {
     }
 
     /**
-     * @dev Returns hodler index in book
+     * @dev Returns hodler index in book or reverts if doesn't exists
      * @param account address Address to check
      * @return uint256 Address index
      */
