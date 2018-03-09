@@ -1,8 +1,8 @@
 pragma solidity 0.4.19;
 
-import { Ownable } from "zeppelin-solidity/contracts/ownership/Ownable.sol";
-import { SafeMath } from "zeppelin-solidity/contracts/math/SafeMath.sol";
-import { BasicToken } from "zeppelin-solidity/contracts/token/ERC20/BasicToken.sol";
+import {Ownable} from "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import {SafeMath} from "zeppelin-solidity/contracts/math/SafeMath.sol";
+import {BasicToken} from "zeppelin-solidity/contracts/token/ERC20/BasicToken.sol";
 
 
 /**
@@ -45,6 +45,11 @@ contract PragmaticHodlings is Ownable {
         _;
     }
 
+    modifier onlyPast(uint32 timestamp) {
+        require(now > timestamp);
+        _;
+    }
+
     /**
      * @dev Token is settled on hodlers addresses
      * @param token address The token address
@@ -53,10 +58,10 @@ contract PragmaticHodlings is Ownable {
     event TokenSettled(address token, uint256 amount);
 
     /**
-    * @dev New hodler registered
-    * @param account address The hodler address
-    * @param joinTimestamp uint32 Timestamp, when hodler joined
-    */
+     * @dev New hodler registered
+     * @param account address The hodler address
+     * @param joinTimestamp uint32 Timestamp, when hodler joined
+     */
     event HodlerRegistered(address account, uint32 joinTimestamp);
 
     /**
@@ -66,20 +71,22 @@ contract PragmaticHodlings is Ownable {
     event HodlerFired(address account);
 
     /**
-    * @dev Register new hodler
-    * @param account address The hodler address
-    * @param joinTimestamp uint32 Timestamp, when hodler joined
-    */
+     * @dev Register new hodler
+     * @param account address The hodler address
+     * @param joinTimestamp uint32 Timestamp, when hodler joined
+     */
     function registerHodler(address account, uint32 joinTimestamp)
         public
         onlyOwner
         onlyNotHodler(account)
+        onlyPast(joinTimestamp)
     {
         hodlers.push(
             Hodler({
-                account: account,
-                joinTimestamp: joinTimestamp
-            }));
+                account : account,
+                joinTimestamp : joinTimestamp
+            })
+        );
 
         HodlerRegistered(account, joinTimestamp);
     }
@@ -135,16 +142,15 @@ contract PragmaticHodlings is Ownable {
     {
         uint256[] memory tokenShares = new uint256[](hodlers.length);
 
-        uint256 daysSum = 0;
+        uint256 sum = 0;
         for (uint i = 0; i < hodlers.length; i++) {
             // solhint-disable-next-line not-rely-on-time
-            uint256 hodlerSeniority = now.sub(hodlers[i].joinTimestamp);
-            tokenShares[i] = hodlerSeniority.div(DAY_IN_SECONDS).add(1);
-            daysSum = daysSum.add(tokenShares[i]);
+            tokenShares[i] = now.sub(hodlers[i].joinTimestamp);
+            sum = sum.add(tokenShares[i]);
         }
 
         for (i = 0; i < hodlers.length; i++) {
-            tokenShares[i] = amount.mul(tokenShares[i]).div(daysSum);
+            tokenShares[i] = amount.mul(tokenShares[i]).div(sum);
         }
 
         return tokenShares;

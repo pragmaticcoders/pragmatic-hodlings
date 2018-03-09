@@ -2,14 +2,14 @@ import { assert } from 'chai';
 
 import * as Web3 from 'web3';
 
-import { HoldingsArtifacts, TestToken } from 'hodlings';
+import { HodlingsArtifacts, TestToken } from 'hodlings';
 
 import { BigNumber } from 'bignumber.js';
 import { ContractContextDefinition } from 'truffle';
 import { assertNumberEqual } from './helpers';
 
 declare const web3: Web3;
-declare const artifacts: HoldingsArtifacts;
+declare const artifacts: HodlingsArtifacts;
 declare const contract: ContractContextDefinition;
 
 const TestTokenContract = artifacts.require('./TestToken.sol');

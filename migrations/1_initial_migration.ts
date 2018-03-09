@@ -1,7 +1,7 @@
-import { HoldingsArtifacts } from 'hodlings';
+import { HodlingsArtifacts } from 'hodlings';
 import { Deployer } from 'truffle';
 
-declare const artifacts: HoldingsArtifacts;
+declare const artifacts: HodlingsArtifacts;
 
 const Migrations = artifacts.require('./Migrations.sol');
 

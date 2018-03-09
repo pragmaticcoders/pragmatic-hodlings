@@ -63,3 +63,8 @@ typings/
 # WebStorm config directory
 .idea/
 
+# Plots and other generated data
+scripts/outputs/*.png
+scripts/outputs/*.csv*
+
+
