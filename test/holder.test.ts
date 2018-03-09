@@ -130,31 +130,35 @@ contract('PragmaticHodlings', accounts => {
       await testSettlement(hodlers);
     });
 
-    it('should transfer simple calculated proportions with new hodler', async () => {
-      const transferAmount = new BigNumber(2000);
-      await setupAmountToSettle(transferAmount);
+    it(
+      'should transfer simple calculated proportions with new hodler',
+      async () => {
+        const transferAmount = new BigNumber(2000);
+        await setupAmountToSettle(transferAmount);
 
-      const hodlers: TestHodler[] = [
-        new TestHodler(1100, 916),
-        new TestHodler(900, 750),
-        new TestHodler(300, 250),
-        new TestHodler(100, 83),
-      ];
+        const hodlers: TestHodler[] = [
+          new TestHodler(1100, 916),
+          new TestHodler(900, 750),
+          new TestHodler(300, 250),
+          new TestHodler(100, 83),
+        ];
 
-      await testSettlement(hodlers);
-    });
+        await testSettlement(hodlers);
+      });
 
-    it('should transfer simple calculated proportions after delete hodler', async () => {
-      const transferAmount = new BigNumber(2000);
-      await setupAmountToSettle(transferAmount);
+    it(
+      'should transfer simple calculated proportions after delete hodler',
+      async () => {
+        const transferAmount = new BigNumber(2000);
+        await setupAmountToSettle(transferAmount);
 
-      const hodlers: TestHodler[] = [
-        new TestHodler(1000, 1111),
-        new TestHodler(800, 888),
-      ];
+        const hodlers: TestHodler[] = [
+          new TestHodler(1000, 1111),
+          new TestHodler(800, 888),
+        ];
 
-      await testSettlement(hodlers);
-    });
+        await testSettlement(hodlers);
+      });
 
     it('should revert if contract has no tokens', async () => {
       await hodlings.registerHodler(accounts[1], 100, { from: owner });
