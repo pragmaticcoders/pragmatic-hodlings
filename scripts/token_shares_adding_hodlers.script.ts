@@ -6,8 +6,8 @@ import * as Web3 from 'web3';
 declare const artifacts: HodlingsArtifacts;
 declare const web3: Web3;
 
-const measurementInterval = 30;
-const measurementsCount = 13;
+const measurementInterval = 10;
+const measurementsCount = 39;
 
 async function asyncExec() {
 
@@ -17,7 +17,8 @@ async function asyncExec() {
     1000, 950, 900, 850, 750,
     700, 650, 600, 550, 500,
     450, 400, 350, 300, 250,
-    200, 150, 100, 50, 0
+    200, 150, 100, 50, 0,
+    -30, -60, -90, -120
   ];
 
   await calculateShares(

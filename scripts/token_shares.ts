@@ -21,7 +21,7 @@ let TestTokenContract: TestTokenContract;
 
 export async function calculateShares(
   hodlersWorkedDays: number[],
-  hodlersToJoin: number[],
+  hodlersToRemove: Array<{ removeDay: number, index: number }>,
   measurementInterval: number,
   measurementsCount: number,
   artifacts: HodlingsArtifacts,
@@ -37,8 +37,9 @@ export async function calculateShares(
     timeShiftDays <= measurementsCount * measurementInterval;
     timeShiftDays += measurementInterval
   ) {
-    if (hodlersToJoin.find(joiningDay => joiningDay === timeShiftDays)) {
-      hodlersWorkedDays.push(0);
+
+    if (hodlersToRemove.find(hodler => hodler.removeDay === timeShiftDays)) {
+      // todo hodlersWorkedDays.push(-timeShiftDays);
     }
 
     const csvRowData: number[] =
@@ -89,11 +90,14 @@ async function calculate(
   const currentTimestamp = Math.floor(Date.now() / 1000);
 
   for (const [idx, hodlerWorkDuration] of hodlersWorkDuration.entries()) {
-    await hodlings.addHodler(
-      numberToAddress(idx),
-      currentTimestamp - (timeShiftDays + hodlerWorkDuration) * DAYS_IN_SECONDS,
-      { from: owner }
-    );
+    const durationWithTimeShift = timeShiftDays + hodlerWorkDuration;
+    if (durationWithTimeShift > 0) { // if hodler is already joined
+      await hodlings.addHodler(
+        numberToAddress(idx),
+        currentTimestamp - durationWithTimeShift * DAYS_IN_SECONDS,
+        { from: owner }
+      );
+    }
   }
 
   const data: number[] = new Array<number>(hodlersWorkDuration.length);
