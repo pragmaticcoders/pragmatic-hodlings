@@ -1,39 +1,35 @@
-import { ScriptFinalizer } from 'truffle';
-
 import { BigNumber } from 'bignumber.js';
 import * as fs from 'fs';
-import { HodlingsArtifacts, PragmaticHodlings, TestToken } from 'hodlings';
+import {
+  HodlingsArtifacts,
+  PragmaticHodlings,
+  PragmaticHodlingsContract,
+  TestToken,
+  TestTokenContract
+} from 'hodlings';
 import * as Web3 from 'web3';
-
-declare const web3: Web3;
-declare const artifacts: HodlingsArtifacts;
 
 const DAYS_IN_SECONDS = 86400;
 
-const PragmaticHodlingsContract = artifacts.require('./PragmaticHodlings.sol');
-const TestTokenContract = artifacts.require('./TestToken.sol');
-
-const measurementsCount = 13;
-const measurementInterval = 30;
 const tokenSupply = new BigNumber(1000);
-const owner = web3.eth.accounts[0];
 
-async function asyncExec() {
+const outputFilename = `./scripts/outputs/token_shares.csv`;
 
-  const hodlersWorkedDays: number[] = [
-    1500, 1450, 1400, 1350, 1300,
-    1250, 1200, 1150, 1100, 1050,
-    1000, 950, 900, 850, 750,
-    700, 650, 600, 550, 500,
-    450, 400, 350, 300, 250,
-    200, 150, 100, 50, 0
-  ];
+let owner: Address;
+let PragmaticHodlingsContract: PragmaticHodlingsContract;
+let TestTokenContract: TestTokenContract;
 
-  const hodlersToJoin: number[] = [
-    1 * measurementInterval,
-    2 * measurementInterval,
-    3 * measurementInterval
-  ];
+export async function calculateShares(
+  hodlersWorkedDays: number[],
+  hodlersToJoin: number[],
+  measurementInterval: number,
+  measurementsCount: number,
+  artifacts: HodlingsArtifacts,
+  web3: Web3
+) {
+  PragmaticHodlingsContract = artifacts.require('./PragmaticHodlings.sol');
+  TestTokenContract = artifacts.require('./TestToken.sol');
+  owner = web3.eth.accounts[0];
 
   const chartData: number[][] = [];
   for (
@@ -42,8 +38,7 @@ async function asyncExec() {
     timeShiftDays += measurementInterval
   ) {
     if (hodlersToJoin.find(joiningDay => joiningDay === timeShiftDays)) {
-      // comment this to keep constant hodlers count
-      // hodlersWorkedDays.push(0);
+      hodlersWorkedDays.push(0);
     }
 
     const csvRowData: number[] =
@@ -51,10 +46,7 @@ async function asyncExec() {
     chartData.push([timeShiftDays, ...csvRowData]);
   }
 
-  const streamWrite = fs.createWriteStream(
-    `./scripts/outputs/alg_constant.csv`,
-    { flags: 'w' }
-  );
+  const streamWrite = fs.createWriteStream(outputFilename, { flags: 'w' });
   const columnNames = ('days' +
     hodlersWorkedDays.reduce((acc, item) => `${acc},${item} days`, '') +
     '\n'
@@ -62,10 +54,7 @@ async function asyncExec() {
   streamWrite.write(columnNames);
   streamWrite.close();
 
-  const streamAppend = fs.createWriteStream(
-    `./scripts/outputs/alg_constant.csv`,
-    { flags: 'a' }
-  );
+  const streamAppend = fs.createWriteStream(outputFilename, { flags: 'a' });
 
   chartData.forEach(row => {
     const parsedRow = row.join(',') + '\n';
@@ -120,9 +109,3 @@ async function calculate(
 function numberToAddress(val: number): Address {
   return '0x' + ((val + 1).toString(16) as any).padStart(40, '0');
 }
-
-function exec(finalize: ScriptFinalizer) {
-  asyncExec().then(() => finalize(), reason => finalize(reason));
-}
-
-export = exec;
