@@ -13,39 +13,65 @@ const DAYS_IN_SECONDS = 86400;
 const PragmaticHodlingsContract = artifacts.require('./PragmaticHodlings.sol');
 const TestTokenContract = artifacts.require('./TestToken.sol');
 
+const measurementsCount = 13;
+const measurementInterval = 30;
 const tokenSupply = new BigNumber(1000);
 const owner = web3.eth.accounts[0];
 
 async function asyncExec() {
 
   const hodlersWorkedDays: number[] = [
-    1500, 1450, 1300, 1250, 1200, 1150, 1100, 1050, 1000, 950,
-    900, 850, 750, 700, 650, 600, 550, 500, 450, 400,
-    350, 300, 250, 200, 150, 100, 50, 0
+    1500, 1450, 1400, 1350, 1300,
+    1250, 1200, 1150, 1100, 1050,
+    1000, 950, 900, 850, 750,
+    700, 650, 600, 550, 500,
+    450, 400, 350, 300, 250,
+    200, 150, 100, 50, 0
+  ];
+
+  const hodlersToJoin: number[] = [
+    1 * measurementInterval,
+    2 * measurementInterval,
+    3 * measurementInterval
   ];
 
   const chartData: number[][] = [];
+  for (
+    let timeShiftDays = 0;
+    timeShiftDays <= measurementsCount * measurementInterval;
+    timeShiftDays += measurementInterval
+  ) {
+    if (hodlersToJoin.find(joiningDay => joiningDay === timeShiftDays)) {
+      // comment this to keep constant hodlers count
+      // hodlersWorkedDays.push(0);
+    }
 
-  for (let timeShiftDays = 0; timeShiftDays <= 120; timeShiftDays += 30) {
     const csvRowData: number[] =
       await setupAndCalculate(hodlersWorkedDays, timeShiftDays);
     chartData.push([timeShiftDays, ...csvRowData]);
   }
 
-  const stream = fs.createWriteStream(
+  const streamWrite = fs.createWriteStream(
+    `./scripts/outputs/alg_constant.csv`,
+    { flags: 'w' }
+  );
+  const columnNames = ('days' +
+    hodlersWorkedDays.reduce((acc, item) => `${acc},${item} days`, '') +
+    '\n'
+  );
+  streamWrite.write(columnNames);
+  streamWrite.close();
+
+  const streamAppend = fs.createWriteStream(
     `./scripts/outputs/alg_constant.csv`,
     { flags: 'a' }
   );
-  const columnNames = ('days' +
-    hodlersWorkedDays.reduce((acc, item) => `${acc},${item}`, '') +
-    '\n'
-  );
-  stream.write(columnNames);
+
   chartData.forEach(row => {
     const parsedRow = row.join(',') + '\n';
-    stream.write(parsedRow);
+    streamAppend.write(parsedRow);
   });
-  stream.end();
+  streamAppend.end();
 }
 
 async function setupAndCalculate(
