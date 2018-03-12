@@ -1,7 +1,7 @@
-import { ScriptFinalizer } from 'truffle';
-import { calculateShares } from './token_shares';
 import { HodlingsArtifacts } from 'hodlings';
+import { ScriptFinalizer } from 'truffle';
 import * as Web3 from 'web3';
+import { calculateShares } from './token_shares';
 
 declare const artifacts: HodlingsArtifacts;
 declare const web3: Web3;
@@ -10,16 +10,16 @@ const measurementInterval = 10;
 const measurementsCount = 39;
 
 async function asyncExec() {
+  let hodlersWorkedDays: number[] = [];
+  process.argv.forEach((item, idx) => {
+    if (item === 'data') {
+      hodlersWorkedDays = JSON.parse(process.argv[idx + 1]);
+    }
+  });
 
-  const hodlersWorkedDays: number[] = [
-    1500, 1450, 1400, 1350, 1300,
-    1250, 1200, 1150, 1100, 1050,
-    1000, 950, 900, 850, 750,
-    700, 650, 600, 550, 500,
-    450, 400, 350, 300, 250,
-    200, 150, 100, 50, 0,
-    -30, -60, -90, -120
-  ];
+  if (!hodlersWorkedDays.length) {
+    throw new Error('data is not specified');
+  }
 
   await calculateShares(
     hodlersWorkedDays,
