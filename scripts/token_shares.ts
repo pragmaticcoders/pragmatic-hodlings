@@ -11,8 +11,6 @@ import * as Web3 from 'web3';
 
 const DAYS_IN_SECONDS = 86400;
 
-const tokenSupply = new BigNumber(1000);
-
 const outputFilename = `./scripts/outputs/token_shares.csv`;
 
 let owner: Address;
@@ -20,6 +18,7 @@ let PragmaticHodlingsContract: PragmaticHodlingsContract;
 let TestTokenContract: TestTokenContract;
 
 export async function calculateShares(
+  tokenSupply: BigNumber,
   hodlersWorkedDays: number[],
   hodlersToRemove: Array<{ removeDay: number, index: number }>,
   measurementInterval: number,
@@ -38,12 +37,8 @@ export async function calculateShares(
     timeShiftDays += measurementInterval
   ) {
 
-    if (hodlersToRemove.find(hodler => hodler.removeDay === timeShiftDays)) {
-      // todo hodlersWorkedDays.push(-timeShiftDays);
-    }
-
     const csvRowData: number[] =
-      await setupAndCalculate(hodlersWorkedDays, timeShiftDays);
+      await setupAndCalculate(tokenSupply, hodlersWorkedDays, hodlersToRemove, timeShiftDays);
     chartData.push([timeShiftDays, ...csvRowData]);
   }
 
@@ -65,7 +60,9 @@ export async function calculateShares(
 }
 
 async function setupAndCalculate(
+  tokenSupply: BigNumber,
   hodlersWorkedDays: number[],
+  hodlersToRemove: any[],
   timeShiftDays: number,
 ): Promise<number[]> {
   const hodlings = await PragmaticHodlingsContract.new({ from: owner });
@@ -78,18 +75,28 @@ async function setupAndCalculate(
   await token.mint(owner, tokenSupply, { from: owner });
   await token.transfer(hodlings.address, tokenSupply, { from: owner });
 
-  return await calculate(hodlings, token, hodlersWorkedDays, timeShiftDays);
+  return await calculate(hodlings, token, hodlersWorkedDays, hodlersToRemove, timeShiftDays);
 }
 
 async function calculate(
   hodlings: PragmaticHodlings,
   token: TestToken,
   hodlersWorkDuration: number[],
+  hodlersToRemove: any[],
   timeShiftDays: number,
 ): Promise<number[]> {
   const currentTimestamp = Math.floor(Date.now() / 1000);
 
+  const removedHodlers = hodlersToRemove.filter(
+    hodler => hodler.removeDay <= timeShiftDays
+  );
+
   for (const [idx, hodlerWorkDuration] of hodlersWorkDuration.entries()) {
+
+    if (removedHodlers.find(item => item.index === idx)) {
+      // removed already
+      continue;
+    }
     const durationWithTimeShift = timeShiftDays + hodlerWorkDuration;
     if (durationWithTimeShift > 0) { // if hodler is already joined
       await hodlings.addHodler(
@@ -104,8 +111,14 @@ async function calculate(
   await hodlings.settleToken(token.address, { from: owner });
 
   for (const [idx] of hodlersWorkDuration.entries()) {
-    const hodlerBalance = await token.balanceOf(numberToAddress(idx));
-    data[idx] = hodlerBalance.toNumber();
+    if (removedHodlers.find(item => item.index === idx)) {
+      // removed already so type nan
+      data[idx] = NaN;
+    } else {
+      const hodlerBalance = await token.balanceOf(numberToAddress(idx));
+      data[idx] = hodlerBalance.toNumber();
+    }
+
   }
   return data;
 }

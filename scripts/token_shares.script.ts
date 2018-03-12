@@ -1,3 +1,4 @@
+import { BigNumber } from 'bignumber.js';
 import { HodlingsArtifacts } from 'hodlings';
 import { ScriptFinalizer } from 'truffle';
 import * as Web3 from 'web3';
@@ -8,6 +9,7 @@ declare const web3: Web3;
 
 const measurementInterval = 10;
 const measurementsCount = 39;
+const tokenSupply = new BigNumber(100000);
 
 async function asyncExec() {
   let hodlersWorkedDays: number[] = [];
@@ -21,9 +23,28 @@ async function asyncExec() {
     throw new Error('data is not specified');
   }
 
+  let hodlersToRemove: Array<{ removeDay: number, index: number }> = [];
+  process.argv.forEach((item, idx) => {
+    if (item === 'dataToRemove') {
+      const rawData: number[][] = JSON.parse(process.argv[idx + 1]);
+      hodlersToRemove = rawData.reduce((acc, raw) => {
+        return [
+          ...acc,
+          {
+            index: raw[1],
+            removeDay: raw[0]
+          }
+        ];
+      }, [] as any[]);
+    }
+  });
+
+  console.log(hodlersToRemove);
+
   await calculateShares(
+    tokenSupply,
     hodlersWorkedDays,
-    [],
+    hodlersToRemove,
     measurementInterval,
     measurementsCount,
     artifacts,
