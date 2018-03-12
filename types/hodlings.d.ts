@@ -11,7 +11,6 @@ declare module 'hodlings' {
   import { AnyNumber } from 'web3';
 
   namespace hodlings {
-
     interface Migrations extends ContractBase {
       setCompleted(
         completed: number,
@@ -69,19 +68,14 @@ declare module 'hodlings' {
       totalSupply(): Promise<BigNumber>;
     }
 
-    interface TokenSettledEvent {
-      token: Address;
-      amount: BigNumber;
-    }
-
     interface PragmaticHodlings extends ContractBase, Ownable {
-      registerHodler(
+      addHodler(
         account: Address,
         joinTimestamp: AnyNumber,
         options?: TransactionOptions
       ): Promise<TransactionResult>;
 
-      fireHodler(
+      removeHodler(
         account: Address,
         options?: TransactionOptions
       ): Promise<TransactionResult>;
@@ -91,18 +85,23 @@ declare module 'hodlings' {
         options?: TransactionOptions
       ): Promise<TransactionResult>;
 
-      isHodler(account: Address): Promise<boolean>;
-
       getHodlers(): Promise<[Address[], BigNumber[]]>;
+
+      isHodler(account: Address): Promise<boolean>;
     }
 
-    interface HodlerRegisteredEvent {
+    interface HodlerAddedEvent {
       account: Address;
       joinTimestamp: BigNumber;
     }
 
-    interface HodlerFiredEvent {
+    interface HodlerRemovedEvent {
       account: Address;
+    }
+
+    interface TokenSettledEvent {
+      token: Address;
+      amount: BigNumber;
     }
 
     interface MigrationsContract extends Contract<Migrations> {
