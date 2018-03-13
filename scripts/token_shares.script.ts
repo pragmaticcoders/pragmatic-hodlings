@@ -39,8 +39,6 @@ async function asyncExec() {
     }
   });
 
-  console.log(hodlersToRemove);
-
   await calculateShares(
     tokenSupply,
     hodlersWorkedDays,

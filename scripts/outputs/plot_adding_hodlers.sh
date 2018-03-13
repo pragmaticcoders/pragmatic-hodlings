@@ -11,7 +11,7 @@ dataArray=(
 for data in "${dataArray[@]}"
 do
     echo "Data: $data"
-    npm run calculate_token_shares -- -- data "$data"
+    npm run calculate_token_shares -- data "$data"
     gnuplot -c plot.sh 50 "Changes of token per hodler in time. Each hodler has different seniority in start day. Hodlers are adding in time. Total token count:100 000" "./token_shares"
     timestamp="$(date +%s)"
     mv ./token_shares.png "./adding_hodlers/$timestamp-token_shares.png"
