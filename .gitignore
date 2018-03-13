@@ -67,4 +67,6 @@ typings/
 scripts/outputs/**/*.png
 scripts/outputs/**/*.csv*
 
-
+# Local blockchain
+chaindata/
+genesis.json
