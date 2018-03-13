@@ -1,11 +1,14 @@
 # Pragmatic Hodlings
 > Pragmatic Hodlings contracts allows any organization to distribute it's
-tokens (ERC20) to all members according to their seniority.
+tokens to all members according to their seniority.
 
 ### Contracts
-* `PragmaticHodlings.sol` - main contract with business logic for token distribution
-* `HodlersBookLib.sol` - library used by main contract for storing members data
-* `TestToken.sol` - contract of Basic ERC20 token used in project tests
+* `PragmaticHodlings` - main contract with business logic for token distribution
+* `MembersBookLib` - library used by main contract for storing members data
+* `TransferableToken` - token contract interface, compatible with Pragmatic Hodlings
+* `TestToken` - token contract based on ERC20 interface, used in test
+
+Check out this project's [Github Pages](https://pragmaticcoders.github.io/pragmatic-hodlings/)
 
 ### Ownership
 It is highly recommended to use Multisig and/or DAO contracts as owner of Pragmatic
@@ -19,12 +22,51 @@ of new owner.
 
 ### Add and remove a member
 
-![#addHodler](https://www.websequencediagrams.com/cgi-bin/cdraw?lz=T3duZXItPitQcmFnbWF0aWNcbkhvZGxpbmdzOiBhZGRIb2RsZXIKAAwTLS0-LQA5BTogAB8GQWRkZWQgZXZlbnQKCg&s=patent)
-![#removeHodler](https://www.websequencediagrams.com/cgi-bin/cdraw?lz=T3duZXItPitQcmFnbWF0aWNcbkhvZGxpbmdzOiByZW1vdmVIb2RsZXIKAA8TLS0-LQA8BTogAB8GUgAsBWQgZXZlbnQKCg&s=patent)
+![#addHodler](https://pragmaticcoders.github.io/pragmatic-hodlings/images/addHodler.png)
+![#removeHodler](https://pragmaticcoders.github.io/pragmatic-hodlings/images/removeHodler.png)
 
-### Receive and settle ERC20 token
+### Receive and Settle token
 
-![#receiveAndSettleToken](https://www.websequencediagrams.com/cgi-bin/cdraw?lz=RG9uYXRvci0tPkVSQzIwXG5Ub2tlbjogPDx0cmFuc2Zlcj4-Cgpub3RlIG92ZXIgACkHLE93bmVyOiBIaSEgSSd2ZSAAJghyZWQgc29tZVxudG9rZW5zIHRvIHlvdXIgb3JnYW5pemF0aW9uCgoAOgUtPitQcmFnbWF0aWNcbkhvZGxpbmdzOiA8PHNldHRsZQCBBgUAdglyaWdodCBvZiAAIRMKICAgIDw8Y2FsY3VsYXRlU2hhcmVzPj4KZW5kIG5vdGUKCgpsb29wIGZvciBlYWNoIG1lbWJlcgAzBQBxEy0-KwCBdBsgICAgAIIiDC0tPi0AgTQVVACCPgVmZXJlZCBldmVudAplbmQKCgoKAF8ULT4tAIJOBwCCfgVTAIF-BQAwCAoK&s=patent)
+![#receiveAndSettleToken](https://pragmaticcoders.github.io/pragmatic-hodlings/images/transferAndSettleToken.png)
+
+## Members
+
+Owner of contract is allowed to add (no duplicates) and remove members. Each members is
+described by it's ETH address and timestamp related to joining to organization time.
+Member data are stored in array of `Member` structures.
+
+```Solidity
+struct Member {
+    address account;
+    uint32 joined;
+}
+```
+
+## Token share calculation
+
+When owner is calling `settleToken` function, then available token amount is shared between all members
+existing in `MembersBook`. Member's share size is directly related to member's seniority, and is
+calculated from the following formula:
+
+![sharesFormula](https://pragmaticcoders.github.io/pragmatic-hodlings/images/shareFormula.gif)
+
+where
+![A](https://pragmaticcoders.github.io/pragmatic-hodlings/images/a.gif) is shared amount,
+![S](https://pragmaticcoders.github.io/pragmatic-hodlings/images/s.gif) is member seniority,
+![n](https://pragmaticcoders.github.io/pragmatic-hodlings/images/n.gif) is member index and
+![m](https://pragmaticcoders.github.io/pragmatic-hodlings/images/m.gif) is member count
+
+The chart presented below perfectly shows how token shares differ in time and how each member share
+depends on it's seniority and total members count.
+
+It is important to notice that all shares are approaching in time to
+![aDivM](https://pragmaticcoders.github.io/pragmatic-hodlings/images/aDivM.gif),
+but they will probably never get there. It is a fair enough way to distribute tokens because the
+oldest member always get biggest share but also newer members have a chance to get significant share.
+
+![tokenShares](https://pragmaticcoders.github.io/pragmatic-hodlings/images/tokenShares.png)
+
+## Transfers gas usage
 
 ## Contributing
 
@@ -41,7 +83,7 @@ Usage:
 
 ## Credits
 * Project has been initialized with [TypeScript-Truffle generator](https://github.com/pragmaticcoders/truffle-ts-generator)
-* HodlersBook library based on [SignHash](https://github.com/SignHash/signhash-contracts) project
+* MembersBook library based on [SignHash](https://github.com/SignHash/signhash-contracts) project
 
 ***
 Licence: [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause)
