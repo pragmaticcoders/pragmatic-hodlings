@@ -37,8 +37,12 @@ export async function calculateShares(
     timeShiftDays += measurementInterval
   ) {
 
-    const csvRowData: number[] =
-      await setupAndCalculate(tokenSupply, hodlersWorkedDays, hodlersToRemove, timeShiftDays);
+    const csvRowData: number[] = await setupAndCalculate(
+      tokenSupply,
+      hodlersWorkedDays,
+      hodlersToRemove,
+      timeShiftDays
+    );
     chartData.push([timeShiftDays, ...csvRowData]);
   }
 
@@ -75,7 +79,13 @@ async function setupAndCalculate(
   await token.mint(owner, tokenSupply, { from: owner });
   await token.transfer(hodlings.address, tokenSupply, { from: owner });
 
-  return await calculate(hodlings, token, hodlersWorkedDays, hodlersToRemove, timeShiftDays);
+  return await calculate(
+    hodlings,
+    token,
+    hodlersWorkedDays,
+    hodlersToRemove,
+    timeShiftDays
+  );
 }
 
 async function calculate(
@@ -110,13 +120,18 @@ async function calculate(
   const data: number[] = new Array<number>(hodlersWorkDuration.length);
   await hodlings.settleToken(token.address, { from: owner });
 
-  for (const [idx] of hodlersWorkDuration.entries()) {
+  for (const [idx, duration] of hodlersWorkDuration.entries()) {
     if (removedHodlers.find(item => item.index === idx)) {
-      // removed already so type nan
+      // removed already, so type NaN to data
       data[idx] = NaN;
     } else {
-      const hodlerBalance = await token.balanceOf(numberToAddress(idx));
-      data[idx] = hodlerBalance.toNumber();
+      if (duration < 0 && timeShiftDays < Math.abs(duration)) {
+        // not added yet, so type NaN to data
+        data[idx] = NaN;
+      } else {
+        const hodlerBalance = await token.balanceOf(numberToAddress(idx));
+        data[idx] = hodlerBalance.toNumber();
+      }
     }
 
   }
