@@ -2,8 +2,18 @@ pragma solidity 0.4.19;
 
 import { Ownable } from "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import { SafeMath } from "zeppelin-solidity/contracts/math/SafeMath.sol";
-import { BasicToken } from "zeppelin-solidity/contracts/token/ERC20/BasicToken.sol";
 import { HodlersBookLib } from "./HodlersBookLib.sol";
+
+
+/**
+ * @title Token interface compatible with Pragmatic Hodlings
+ * @author Wojciech Harzowski (https://github.com/harzo)
+ * @author Dominik Kroliczek (https://github.com/kruligh)
+ */
+contract TransferableToken {
+    function transfer(address to, uint256 amount) public;
+    function balanceOf(address who) public view returns (uint256);
+}
 
 
 /**
@@ -43,7 +53,7 @@ contract PragmaticHodlings is Ownable {
         _;
     }
 
-    modifier onlySufficientAmount(BasicToken token) {
+    modifier onlySufficientAmount(TransferableToken token) {
         require(token.balanceOf(this) > 0);
         _;
     }
@@ -57,9 +67,9 @@ contract PragmaticHodlings is Ownable {
     /**
     * @dev New hodler has been added to book
     * @param account address Hodler's address
-    * @param joinTimestamp uint32 Hodler's joining timestamp
+    * @param joined uint32 Hodler's joining timestamp
     */
-    event HodlerAdded(address account, uint32 joinTimestamp);
+    event HodlerAdded(address account, uint32 joined);
 
     /**
      * @dev Existing hodler has been removed
@@ -77,17 +87,17 @@ contract PragmaticHodlings is Ownable {
     /**
      * @dev Adds new hodler to book
      * @param account address Hodler's address
-     * @param joinTimestamp uint32 Hodler's joining timestamp
+     * @param joined uint32 Hodler's joining timestamp
      */
-    function addHodler(address account, uint32 joinTimestamp)
+    function addHodler(address account, uint32 joined)
         public
         onlyOwner
         onlyValidAddress(account)
         onlyNotExisting(account)
-        onlyPast(joinTimestamp)
+        onlyPast(joined)
     {
-        hodlers.add(account, joinTimestamp);
-        HodlerAdded(account, joinTimestamp);
+        hodlers.add(account, joined);
+        HodlerAdded(account, joined);
     }
 
     /**
@@ -108,7 +118,7 @@ contract PragmaticHodlings is Ownable {
      * @dev Settles given token on hodlers addresses
      * @param token BasicToken The token to settle
      */
-    function settleToken(BasicToken token)
+    function settleToken(TransferableToken token)
         public
         onlyOwner
         onlyHodlersExist
@@ -140,7 +150,7 @@ contract PragmaticHodlings is Ownable {
         uint256 sum = 0;
         for (uint256 i = 0; i < temp.length; i++) {
             // solhint-disable-next-line not-rely-on-time
-            temp[i] = now.sub(hodlers.entries[i].joinTimestamp);
+            temp[i] = now.sub(hodlers.entries[i].joined);
             sum = sum.add(temp[i]);
         }
 
@@ -166,7 +176,7 @@ contract PragmaticHodlings is Ownable {
 
         for (uint256 i = 0; i < hodlers.entries.length; i++) {
             hodlersAddresses[i] = hodlers.entries[i].account;
-            hodlersTimestamps[i] = hodlers.entries[i].joinTimestamp;
+            hodlersTimestamps[i] = hodlers.entries[i].joined;
         }
 
         return (hodlersAddresses, hodlersTimestamps);
