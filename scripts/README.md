@@ -7,8 +7,8 @@
 
 ### prerequisites
     - Installed gnuplot (e.g. sudo apt install gnuplot)
-    - Network specified in truffle-config as a testrpc should be available.
-    - Contracts should be deployed.
+    - Network specified in truffle-config as a testrpc should be available. (e.g. ganache-cli)
+    - Contracts should be compiled. (npm run compile:sol)
 
 ### genarate CSV data
     - npm run calculate_token_shares -- data "[100, 200, 300, 400]" dataToRemove "[[60, 2], [90, 1]]"
