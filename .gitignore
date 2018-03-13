@@ -64,7 +64,7 @@ typings/
 .idea/
 
 # Plots and other generated data
-scripts/outputs/*.png
-scripts/outputs/*.csv*
+scripts/outputs/**/*.png
+scripts/outputs/**/*.csv*
 
 
