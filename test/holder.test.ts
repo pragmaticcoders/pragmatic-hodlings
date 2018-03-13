@@ -218,7 +218,7 @@ contract('PragmaticHodlings', accounts => {
       );
       assertNumberEqual(currentHodlers.length, 1);
       assert.equal(currentHodlers[0].address, hodler);
-      assertNumberEqual(currentHodlers[0].joinTimestamp, hodlerTimestamp);
+      assertNumberEqual(currentHodlers[0].joined, hodlerTimestamp);
     });
 
     it('Should emit HodlerAdded event', async () => {
@@ -233,17 +233,17 @@ contract('PragmaticHodlings', accounts => {
       const event = log.args as HodlerAddedEvent;
       assert.isOk(event);
       assert.equal(event.account, hodler);
-      assertNumberEqual(event.joinTimestamp, new BigNumber(hodlerTimestamp));
+      assertNumberEqual(event.joined, new BigNumber(hodlerTimestamp));
     });
 
     it('Should add few hodlers', async () => {
       const hodlers: Hodler[] = accounts.map((address, idx): Hodler => ({
         address,
-        joinTimestamp: new BigNumber(idx).add(1)
+        joined: new BigNumber(idx).add(1)
       }));
 
       await hodlers.forEach(async hodler => {
-        await hodlings.addHodler(hodler.address, hodler.joinTimestamp, {
+        await hodlings.addHodler(hodler.address, hodler.joined, {
           from: owner
         });
       });
@@ -258,7 +258,7 @@ contract('PragmaticHodlings', accounts => {
         );
 
         assert.isOk(added);
-        assertNumberEqual(added!.joinTimestamp, hodler.joinTimestamp);
+        assertNumberEqual(added!.joined, hodler.joined);
       });
     });
 
@@ -358,7 +358,7 @@ contract('PragmaticHodlings', accounts => {
 
 interface Hodler {
   address: Address;
-  joinTimestamp: AnyNumber;
+  joined: AnyNumber;
 }
 
 class TestHodler {
@@ -377,7 +377,7 @@ function parseHodlers(args: [Address[], BigNumber[]]): Hodler[] {
   for (let i = 0; i < addresses.length; i++) {
     result[i] = {
       address: addresses[i],
-      joinTimestamp: timestamps[i],
+      joined: timestamps[i],
     };
   }
   return result;

@@ -15,7 +15,7 @@ library HodlersBookLib {
      */
     struct Hodler {
         address account;
-        uint32 joinTimestamp;
+        uint32 joined;
     }
 
     /**
@@ -28,12 +28,12 @@ library HodlersBookLib {
     /**
      * @dev Adds new hodler to book
      * @param account address Hodler's address
-     * @param joinTimestamp uint32 Hodler's joining timestamp
+     * @param joined uint32 Hodler's joining timestamp
      */
     function add(
         HodlersBook storage self,
         address account,
-        uint32 joinTimestamp
+        uint32 joined
     )
         internal
         returns (bool)
@@ -45,7 +45,7 @@ library HodlersBookLib {
         self.entries.push(
             Hodler({
                 account: account,
-                joinTimestamp: joinTimestamp
+                joined: joined
             }));
 
         return true;

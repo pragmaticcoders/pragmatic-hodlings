@@ -102,8 +102,8 @@ contract TestHodlersBookLib {
         add(ADDRESS_3, TIMESTAMP_3);
     }
 
-    function add(address account, uint32 joinTimestamp) private {
-        bool added = book.add(account, joinTimestamp);
+    function add(address account, uint32 joined) private {
+        bool added = book.add(account, joined);
         Assert.isTrue(added, "Should add");
     }
 

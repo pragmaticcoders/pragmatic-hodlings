@@ -71,7 +71,7 @@ declare module 'hodlings' {
     interface PragmaticHodlings extends ContractBase, Ownable {
       addHodler(
         account: Address,
-        joinTimestamp: AnyNumber,
+        joined: AnyNumber,
         options?: TransactionOptions
       ): Promise<TransactionResult>;
 
@@ -92,7 +92,7 @@ declare module 'hodlings' {
 
     interface HodlerAddedEvent {
       account: Address;
-      joinTimestamp: BigNumber;
+      joined: BigNumber;
     }
 
     interface HodlerRemovedEvent {
