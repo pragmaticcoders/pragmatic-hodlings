@@ -2,36 +2,36 @@ pragma solidity 0.4.19;
 
 
 /**
- * @title HodlersBook library
- * @dev Allows to store and manage addresses of hodlers in contract
+ * @title MembersBook library
+ * @dev Allows to store and manage addresses of members in contract
  * @author Wojciech Harzowski (https://github.com/harzo)
  * @author Dominik Kroliczek (https://github.com/kruligh)
  */
-library HodlersBookLib {
+library MembersBookLib {
 
     /**
-     * @dev Represents hodler with its address and
+     * @dev Represents member with its address and
      * @dev joining to organization timestamp
      */
-    struct Hodler {
+    struct Member {
         address account;
         uint32 joined;
     }
 
     /**
-     * @dev Represents set of hodlers
+     * @dev Represents set of members
      */
-    struct HodlersBook {
-        Hodler[] entries;
+    struct MembersBook {
+        Member[] entries;
     }
 
     /**
-     * @dev Adds new hodler to book
-     * @param account address Hodler's address
-     * @param joined uint32 Hodler's joining timestamp
+     * @dev Adds new member to book
+     * @param account address Member's address
+     * @param joined uint32 Member's joining timestamp
      */
     function add(
-        HodlersBook storage self,
+        MembersBook storage self,
         address account,
         uint32 joined
     )
@@ -43,7 +43,7 @@ library HodlersBookLib {
         }
 
         self.entries.push(
-            Hodler({
+            Member({
                 account: account,
                 joined: joined
             }));
@@ -52,11 +52,11 @@ library HodlersBookLib {
     }
 
     /**
-     * @dev Removes existing hodler from book
-     * @param account address Hodler's address whose should be removed
+     * @dev Removes existing member from book
+     * @param account address Member's address whose should be removed
      */
     function remove(
-        HodlersBook storage self,
+        MembersBook storage self,
         address account
     )
         internal
@@ -77,12 +77,12 @@ library HodlersBookLib {
     }
 
     /**
-     * @dev Checks if hodler address exists in book
+     * @dev Checks if member address exists in book
      * @param account address Address to check
      * @return bool Address existence indicator
      */
     function contains(
-        HodlersBook storage self,
+        MembersBook storage self,
         address account
     )
         internal
@@ -98,12 +98,12 @@ library HodlersBookLib {
     }
 
     /**
-     * @dev Returns hodler index in book or reverts if doesn't exists
+     * @dev Returns member index in book or reverts if doesn't exists
      * @param account address Address to check
      * @return uint256 Address index
      */
     function index(
-        HodlersBook storage self,
+        MembersBook storage self,
         address account
     )
         private

@@ -1,15 +1,15 @@
 pragma solidity 0.4.19;
 
 import "truffle/Assert.sol";
-import "../../contracts/HodlersBookLib.sol";
+import "../../contracts/MembersBookLib.sol";
 
 
 library Helpers {
 
-    using HodlersBookLib for HodlersBookLib.HodlersBook;
+    using MembersBookLib for MembersBookLib.MembersBook;
 
     function deepEqual(
-        HodlersBookLib.HodlersBook storage book,
+        MembersBookLib.MembersBook storage book,
         address[2] memory expectedAddresses,
         uint32[2] memory expectedTimestamps
     )
@@ -27,7 +27,7 @@ library Helpers {
     }
 
     function deepEqual(
-        HodlersBookLib.HodlersBook storage book,
+        MembersBookLib.MembersBook storage book,
         address[3] memory expectedAddresses,
         uint32[3] memory expectedTimestamps
     )
@@ -47,7 +47,7 @@ library Helpers {
     }
 
     function deepEqual(
-        HodlersBookLib.HodlersBook storage book,
+        MembersBookLib.MembersBook storage book,
         address[] memory expectedAddresses,
         uint32[] memory expectedTimestamps
     )
