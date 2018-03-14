@@ -7,7 +7,7 @@ declare const artifacts: HodlingsArtifacts;
 declare const web3: Web3;
 
 const amountPerIteration = new BigNumber(1000000);
-const iterationsCount = 50;
+const iterationsCount = 20;
 
 const PragmaticHodlingsContract = artifacts.require('./PragmaticHodlings.sol');
 const TestTokenContract = artifacts.require('./TestToken.sol');

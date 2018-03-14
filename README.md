@@ -68,6 +68,23 @@ oldest member always get biggest share but also newer members have a chance to g
 
 ## Transfers gas usage
 
+Token settlement gas usage depends on total member count and token transfer method implementation.
+Gas usage was tested for ERC20 OpenZeppelin implementation. Testing accounts never owned tokens.
+Average change of gas usage after add new member for 100 members was 33 000 gas.
+Actual block gas limit is 8 milions. 
+
+8 000 000 / 33 000 ~~ 242
+
+With this calculation maximum of members in contract is about 242. 
+
+If block gas limit were decreased or added more than available members, solution is:
+- create newer version of contract (e.g. with request withdraw) 
+- move all members to new contract
+- add as a only member created contract, then do settlement on old contract.
+It is a emergency scenario. 
+
+Warning! Count of max members calculated as 242 depends on token transfer gas usage and current block gas limit.
+
 ## Contributing
 
 When submitting a bugfix, write a test that exposes the bug and fails before applying
