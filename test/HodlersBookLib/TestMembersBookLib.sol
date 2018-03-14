@@ -1,14 +1,14 @@
 pragma solidity 0.4.19;
 
 import "truffle/Assert.sol";
-import { HodlersBookLib } from "../../contracts/HodlersBookLib.sol";
+import { MembersBookLib } from "../../contracts/MembersBookLib.sol";
 import { Helpers } from "./Helpers.sol";
 
 
-contract TestHodlersBookLib {
+contract TestMembersBookLib {
 
-    using HodlersBookLib for HodlersBookLib.HodlersBook;
-    using Helpers for HodlersBookLib.HodlersBook;
+    using MembersBookLib for MembersBookLib.MembersBook;
+    using Helpers for MembersBookLib.MembersBook;
 
     address private constant ZERO_ADDRESS = address(0x0);
     address private constant ADDRESS_1 = address(0xdeadbeef);
@@ -18,7 +18,7 @@ contract TestHodlersBookLib {
     uint32 private constant TIMESTAMP_2 = 2000;
     uint32 private constant TIMESTAMP_3 = 3000;
 
-    HodlersBookLib.HodlersBook private book;
+    MembersBookLib.MembersBook private book;
 
     function beforeEach() public {
         delete book;

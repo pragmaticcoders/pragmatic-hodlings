@@ -2,7 +2,7 @@ pragma solidity 0.4.19;
 
 import { Ownable } from "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import { SafeMath } from "zeppelin-solidity/contracts/math/SafeMath.sol";
-import { HodlersBookLib } from "./HodlersBookLib.sol";
+import { MembersBookLib } from "./MembersBookLib.sol";
 
 
 /**
@@ -26,9 +26,9 @@ contract TransferableToken {
 contract PragmaticHodlings is Ownable {
 
     using SafeMath for uint256;
-    using HodlersBookLib for HodlersBookLib.HodlersBook;
+    using MembersBookLib for MembersBookLib.MembersBook;
 
-    HodlersBookLib.HodlersBook private hodlers;
+    MembersBookLib.MembersBook private hodlers;
 
     /**
      * @dev Stores addresses added to book
