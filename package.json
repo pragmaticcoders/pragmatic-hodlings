@@ -1,6 +1,7 @@
 {
-  "name": "pragmatic-holings-contracts",
-  "version": "0.0.0",
+  "name": "pragmatic-hodlings-contracts",
+  "version": "0.9.0",
+  "description": "Pragmatic Hodlings contracts allows any organization to distribute it's tokens to all members according to their seniority",
   "main": "index.js",
   "scripts": {
     "compile": "run-s compile:ts compile:sol",
@@ -15,11 +16,16 @@
     "format": "prettier --write \"**/*.ts\"",
     "calculate_token_shares": "npm run compile:ts && truffle exec scripts/token_shares.script.js --network testrpc"
   },
+  "homepage": "https://github.com/pragmaticcoders/pragmatic-hodlings",
+  "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pragmaticcoders/pragmatic-holdings"
+    "url": "https://github.com/pragmaticcoders/pragmatic-hodlings"
   },
-  "license": "ISC",
+  "contributors": [
+    "Wojciech Harzowski (https://github.com/harzo)",
+    "Dominik Kroliczek (https://github.com/kruligh)"
+  ],
   "devDependencies": {
     "@types/chai": "^4.0.8",
     "@types/mocha": "^2.2.44",
