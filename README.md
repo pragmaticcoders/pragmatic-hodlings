@@ -8,7 +8,7 @@ tokens to all members according to their seniority.
 * `TransferableToken` - token contract interface, compatible with Pragmatic Hodlings
 * `TestToken` - token contract based on ERC20 interface, used in test
 
-Check out this project's [Github Pages](https://pragmaticcoders.github.io/pragmatic-hodlings/)
+Check out this project on [Github Pages](https://pragmaticcoders.github.io/pragmatic-hodlings/)
 
 ### Ownership
 It is highly recommended to use Multisig and/or DAO contracts as owner of Pragmatic
@@ -66,24 +66,20 @@ oldest member always get biggest share but also newer members have a chance to g
 
 ![tokenShares](https://pragmaticcoders.github.io/pragmatic-hodlings/images/tokenShares.png)
 
-## Transfers gas usage
+## Settlement gas costs and maximum members count
 
-Token settlement gas usage depends on total member count and token transfer method implementation.
-Gas usage was tested for ERC20 OpenZeppelin implementation. Testing accounts never owned tokens.
-Average change of gas usage after add new member for 100 members was 33 000 gas.
-Actual block gas limit is 8 milions. 
+After running several tests of gas used by `settleToken` function we came up with some conclusions. Test were done for Zeppelin ERC20 token implementation, test accounts have never owned tokens, and members count on contract was increasing up to 100. 
 
-8 000 000 / 33 000 ~~ 242
+First of all settlement gas cost increase each time we add new member by average 33 000 gas. 
+Furthermore a block has a gas limit which is 8 000 000 for now.
 
-With this calculation maximum of members in contract is about 242. 
+If we do the math we get maximum members count for a contract which is 242.\
+`8 000 000 / 33 000  ~ 242` 
 
-If block gas limit were decreased or added more than available members, solution is:
-- create newer version of contract (e.g. with request withdraw) 
-- move all members to new contract
-- add as a only member created contract, then do settlement on old contract.
-It is a emergency scenario. 
-
-Warning! Count of max members calculated as 242 depends on token transfer gas usage and current block gas limit.
+*Warning!* \
+In case of emergency when member count at contract exceed possible limit we should consider this solusions:
+* Create newer version of contract  (e.g. with scenario when member pays for its transfer)
+* Move all members to new contract
 
 ## Contributing
 
