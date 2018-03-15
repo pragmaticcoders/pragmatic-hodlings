@@ -8,7 +8,7 @@ tokens to all members according to their seniority.
 * `TransferableToken` - token contract interface, compatible with Pragmatic Hodlings
 * `TestToken` - token contract based on ERC20 interface, used in test
 
-Check out this project's [Github Pages](https://pragmaticcoders.github.io/pragmatic-hodlings/)
+Check out this project on [Github Pages](https://pragmaticcoders.github.io/pragmatic-hodlings/)
 
 ### Ownership
 It is highly recommended to use Multisig and/or DAO contracts as owner of Pragmatic
@@ -66,7 +66,20 @@ oldest member always get biggest share but also newer members have a chance to g
 
 ![tokenShares](https://pragmaticcoders.github.io/pragmatic-hodlings/images/tokenShares.png)
 
-## Transfers gas usage
+## Settlement gas costs and maximum members count
+
+After running several tests of gas used by `settleToken` function we came up with some conclusions. Test were done for Zeppelin ERC20 token implementation, test accounts have never owned tokens, and members count on contract was increasing up to 100. 
+
+First of all settlement gas cost increase each time we add new member by average 33 000 gas. 
+Furthermore a block has a gas limit which is 8 000 000 for now.
+
+If we do the math we get maximum members count for a contract which is 242.\
+`8 000 000 / 33 000  ~ 242` 
+
+*Warning!* \
+In case of emergency when member count at contract exceed possible limit we should consider this solusions:
+* Create newer version of contract  (e.g. with scenario when member pays for its transfer)
+* Move all members to new contract
 
 ## Contributing
 
