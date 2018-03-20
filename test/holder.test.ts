@@ -182,8 +182,7 @@ contract('PragmaticHodlings', accounts => {
       for (const [idx, hodler] of hodlers.entries()) {
         assertNumberEqual(
           await token.balanceOf(accounts[idx]),
-          hodler.expectedAmount,
-          1
+          hodler.expectedAmount
         );
       }
     }
