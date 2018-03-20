@@ -154,8 +154,14 @@ contract PragmaticHodlings is Ownable {
             sum = sum.add(temp[i]);
         }
 
+        uint256 sharesSum = 0;
         for (i = 0; i < temp.length; i++) {
             temp[i] = amount.mul(temp[i]).div(sum);
+            sharesSum += temp[i];
+        }
+
+        if (amount > sharesSum) { // undivided rest of token
+            temp[0] = temp[0].add(amount.sub(sharesSum));
         }
 
         return temp;
