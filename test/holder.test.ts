@@ -49,15 +49,14 @@ contract('PragmaticHodlings', accounts => {
 
   describe('#settleToken', () => {
     const tokenTotalSupply = new BigNumber(1000000000);
-    const tokenAvailableAmount = new BigNumber(1000000);
     let token: TestToken;
 
     beforeEach(async () => {
       token = await TestTokenContract.new('PC Token', 'PC', tokenTotalSupply, {
         from: owner
       });
-      await token.mint(owner, tokenAvailableAmount, { from: owner });
-      assertNumberEqual(await token.balanceOf(owner), tokenAvailableAmount);
+      await token.mint(owner, tokenTotalSupply, { from: owner });
+      assertNumberEqual(await token.balanceOf(owner), tokenTotalSupply);
     });
 
     context('after token transfer', () => {
@@ -111,39 +110,55 @@ contract('PragmaticHodlings', accounts => {
     });
 
     it('should transfer simple calculated proportions', async () => {
-      const transferAmount = new BigNumber(2000);
+      const transferAmount = new BigNumber(8640);
       await setupAmountToSettle(transferAmount);
 
       const hodlers: TestHodler[] = [
-        new TestHodler(1000, 1000),
-        new TestHodler(800, 800),
-        new TestHodler(200, 200)
+        new TestHodler(10000000, 4320),
+        new TestHodler(8000000, 3456),
+        new TestHodler(2000000, 864)
       ];
 
       await testSettlement(hodlers);
     });
 
     it('should transfer simple calculated proportions with new hodler', async () => {
-      const transferAmount = new BigNumber(2000);
+      const transferAmount = new BigNumber(864);
       await setupAmountToSettle(transferAmount);
 
       const hodlers: TestHodler[] = [
-        new TestHodler(1100, 917),
-        new TestHodler(900, 750),
-        new TestHodler(300, 250),
-        new TestHodler(100, 83)
+        new TestHodler(11000000, 396),
+        new TestHodler(9000000, 324),
+        new TestHodler(3000000, 108),
+        new TestHodler(1000000, 36)
       ];
 
       await testSettlement(hodlers);
     });
 
     it('should transfer simple calculated proportions after delete hodler', async () => {
-      const transferAmount = new BigNumber(2000);
+      const transferAmount = new BigNumber(864);
       await setupAmountToSettle(transferAmount);
 
       const hodlers: TestHodler[] = [
-        new TestHodler(1000, 1112),
-        new TestHodler(800, 888)
+        new TestHodler(1000, 480),
+        new TestHodler(800, 384)
+      ];
+
+      await testSettlement(hodlers);
+    });
+
+    it('should transfer rest of tokens to first hodler', async () => {
+      const transferAmount = new BigNumber(1000);
+      await setupAmountToSettle(transferAmount);
+
+      const hodlers: TestHodler[] = [
+        new TestHodler(1000, 166 + 4),
+        new TestHodler(1000, 166),
+        new TestHodler(1000, 166),
+        new TestHodler(1000, 166),
+        new TestHodler(1000, 166),
+        new TestHodler(1000, 166)
       ];
 
       await testSettlement(hodlers);
@@ -168,7 +183,6 @@ contract('PragmaticHodlings', accounts => {
       }
 
       const currentTimestamp = await getNetworkTimestamp();
-
       for (const [idx, hodler] of hodlers.entries()) {
         await hodlings.addHodler(
           accounts[idx],
@@ -339,7 +353,8 @@ interface Hodler {
 }
 
 class TestHodler {
-  constructor(public workedSeconds: number, public expectedAmount: number) {}
+  constructor(public workedSeconds: number, public expectedAmount: number) {
+  }
 }
 
 function parseHodlers(args: [Address[], BigNumber[]]): Hodler[] {
