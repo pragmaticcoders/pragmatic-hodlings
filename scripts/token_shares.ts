@@ -20,7 +20,7 @@ let TestTokenContract: TestTokenContract;
 export async function calculateShares(
   tokenSupply: BigNumber,
   hodlersWorkedDays: number[],
-  hodlersToRemove: Array<{ removeDay: number, index: number }>,
+  hodlersToRemove: Array<{ removeDay: number; index: number }>,
   measurementInterval: number,
   measurementsCount: number,
   artifacts: HodlingsArtifacts,
@@ -36,7 +36,6 @@ export async function calculateShares(
     timeShiftDays <= measurementsCount * measurementInterval;
     timeShiftDays += measurementInterval
   ) {
-
     const csvRowData: number[] = await setupAndCalculate(
       tokenSupply,
       hodlersWorkedDays,
@@ -47,10 +46,10 @@ export async function calculateShares(
   }
 
   const streamWrite = fs.createWriteStream(outputFilename, { flags: 'w' });
-  const columnNames = ('days' +
+  const columnNames =
+    'days' +
     hodlersWorkedDays.reduce((acc, item) => `${acc},${item} days`, '') +
-    '\n'
-  );
+    '\n';
   streamWrite.write(columnNames);
   streamWrite.close();
 
@@ -67,15 +66,12 @@ async function setupAndCalculate(
   tokenSupply: BigNumber,
   hodlersWorkedDays: number[],
   hodlersToRemove: any[],
-  timeShiftDays: number,
+  timeShiftDays: number
 ): Promise<number[]> {
   const hodlings = await PragmaticHodlingsContract.new({ from: owner });
-  const token = await TestTokenContract.new(
-    'PC Token',
-    'PC',
-    tokenSupply,
-    { from: owner }
-  );
+  const token = await TestTokenContract.new('PC Token', 'PC', tokenSupply, {
+    from: owner
+  });
   await token.mint(owner, tokenSupply, { from: owner });
   await token.transfer(hodlings.address, tokenSupply, { from: owner });
 
@@ -93,7 +89,7 @@ async function calculate(
   token: TestToken,
   hodlersWorkDuration: number[],
   hodlersToRemove: any[],
-  timeShiftDays: number,
+  timeShiftDays: number
 ): Promise<number[]> {
   const currentTimestamp = Math.floor(Date.now() / 1000);
 
@@ -102,13 +98,13 @@ async function calculate(
   );
 
   for (const [idx, hodlerWorkDuration] of hodlersWorkDuration.entries()) {
-
     if (removedHodlers.find(item => item.index === idx)) {
       // removed already
       continue;
     }
     const durationWithTimeShift = timeShiftDays + hodlerWorkDuration;
-    if (durationWithTimeShift > 0) { // if hodler is already joined
+    if (durationWithTimeShift > 0) {
+      // if hodler is already joined
       await hodlings.addHodler(
         numberToAddress(idx),
         currentTimestamp - durationWithTimeShift * DAYS_IN_SECONDS,
@@ -133,7 +129,6 @@ async function calculate(
         data[idx] = hodlerBalance.toNumber();
       }
     }
-
   }
   return data;
 }

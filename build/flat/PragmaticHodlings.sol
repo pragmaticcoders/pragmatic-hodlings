@@ -7,44 +7,44 @@ pragma solidity 0.4.19;
  */
 library SafeMath {
 
-  /**
-  * @dev Multiplies two numbers, throws on overflow.
-  */
-  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-    if (a == 0) {
-      return 0;
+    /**
+     * @dev Multiplies two numbers, throws on overflow.
+     */
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        if (a == 0) {
+            return 0;
+        }
+        uint256 c = a * b;
+        assert(c / a == b);
+        return c;
     }
-    uint256 c = a * b;
-    assert(c / a == b);
-    return c;
-  }
 
-  /**
-  * @dev Integer division of two numbers, truncating the quotient.
-  */
-  function div(uint256 a, uint256 b) internal pure returns (uint256) {
-    // assert(b > 0); // Solidity automatically throws when dividing by 0
-    uint256 c = a / b;
-    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-    return c;
-  }
+    /**
+     * @dev Integer division of two numbers, truncating the quotient.
+     */
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        // assert(b > 0); // Solidity automatically throws when dividing by 0
+        uint256 c = a / b;
+        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+        return c;
+    }
 
-  /**
-  * @dev Substracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
-  */
-  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-    assert(b <= a);
-    return a - b;
-  }
+    /**
+     * @dev Substracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
+     */
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        assert(b <= a);
+        return a - b;
+    }
 
-  /**
-  * @dev Adds two numbers, throws on overflow.
-  */
-  function add(uint256 a, uint256 b) internal pure returns (uint256) {
-    uint256 c = a + b;
-    assert(c >= a);
-    return c;
-  }
+    /**
+     * @dev Adds two numbers, throws on overflow.
+     */
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        assert(c >= a);
+        return c;
+    }
 }
 
 
@@ -54,38 +54,36 @@ library SafeMath {
  * functions, this simplifies the implementation of "user permissions".
  */
 contract Ownable {
-  address public owner;
+    address public owner;
 
 
-  event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
+    /**
+     * @dev The Ownable constructor sets the original `owner` of the contract to the sender
+     * account.
+     */
+    function Ownable() public {
+        owner = msg.sender;
+    }
 
-  /**
-   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
-   * account.
-   */
-  function Ownable() public {
-    owner = msg.sender;
-  }
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
 
-  /**
-   * @dev Throws if called by any account other than the owner.
-   */
-  modifier onlyOwner() {
-    require(msg.sender == owner);
-    _;
-  }
-
-  /**
-   * @dev Allows the current owner to transfer control of the contract to a newOwner.
-   * @param newOwner The address to transfer ownership to.
-   */
-  function transferOwnership(address newOwner) public onlyOwner {
-    require(newOwner != address(0));
-    OwnershipTransferred(owner, newOwner);
-    owner = newOwner;
-  }
-
+    /**
+     * @dev Allows the current owner to transfer control of the contract to a newOwner.
+     * @param newOwner The address to transfer ownership to.
+     */
+    function transferOwnership(address newOwner) public onlyOwner {
+        require(newOwner != address(0));
+        OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
+    }
 }
 
 
@@ -123,8 +121,8 @@ library MembersBookLib {
         address account,
         uint32 joined
     )
-    internal
-    returns (bool)
+        internal
+        returns (bool)
     {
         if (account == address(0) || contains(self, account)) {
             return false;
@@ -132,8 +130,8 @@ library MembersBookLib {
 
         self.entries.push(
             Member({
-            account: account,
-            joined: joined
+                account: account,
+                joined: joined
             }));
 
         return true;
@@ -147,8 +145,8 @@ library MembersBookLib {
         MembersBook storage self,
         address account
     )
-    internal
-    returns (bool)
+        internal
+        returns (bool)
     {
         if (!contains(self, account)) {
             return false;
@@ -173,9 +171,9 @@ library MembersBookLib {
         MembersBook storage self,
         address account
     )
-    internal
-    view
-    returns (bool)
+        internal
+        view
+        returns (bool)
     {
         for (uint256 i = 0; i < self.entries.length; i++) {
             if (self.entries[i].account == account) {
@@ -194,9 +192,9 @@ library MembersBookLib {
         MembersBook storage self,
         address account
     )
-    private
-    view
-    returns (uint256)
+        private
+        view
+        returns (uint256)
     {
         for (uint256 i = 0; i < self.entries.length; i++) {
             if (self.entries[i].account == account) {
@@ -357,8 +355,14 @@ contract PragmaticHodlings is Ownable {
             sum = sum.add(temp[i]);
         }
 
+        uint256 sharesSum = 0;
         for (i = 0; i < temp.length; i++) {
             temp[i] = amount.mul(temp[i]).div(sum);
+            sharesSum += temp[i];
+        }
+
+        if (amount > sharesSum) { // undivided rest of token
+            temp[0] = temp[0].add(amount.sub(sharesSum));
         }
 
         return temp;

@@ -14,11 +14,9 @@ const TestTokenContract = artifacts.require('./TestToken.sol');
 const owner = web3.eth.accounts[0];
 
 async function asyncExec() {
-
   const usageData: number[] = [];
 
   for (let idx = 0; idx < iterationsCount; idx++) {
-
     const hodlings = await PragmaticHodlingsContract.new({ from: owner });
     const token = await TestTokenContract.new(
       'PC Token',
@@ -31,11 +29,9 @@ async function asyncExec() {
     await token.transfer(hodlings.address, amountPerIteration, { from: owner });
 
     for (let i = 0; i <= idx; i++) {
-      await hodlings.addHodler(
-        numberToAddress(i + 1),
-        10000000 * idx,
-        { from: owner }
-      );
+      await hodlings.addHodler(numberToAddress(i + 1), 10000000 * idx, {
+        from: owner
+      });
     }
 
     const estimatedGas = await (hodlings.settleToken as any).estimateGas(
@@ -49,10 +45,7 @@ async function asyncExec() {
   let gasChangeSum = 0;
   usageData.forEach((item, idx) => {
     if (idx === 0) {
-      console.log(
-        `hodlers count: ${idx + 1}`,
-        `gas usage: ${item}`
-      );
+      console.log(`hodlers count: ${idx + 1}`, `gas usage: ${item}`);
     } else {
       gasChangeSum += item - usageData[idx - 1];
       console.log(
@@ -63,8 +56,11 @@ async function asyncExec() {
     }
   });
 
-  console.log(`Average gas usage change per user: ${Math.floor(gasChangeSum / (usageData.length - 1))}`);
-
+  console.log(
+    `Average gas usage change per user: ${Math.floor(
+      gasChangeSum / (usageData.length - 1)
+    )}`
+  );
 }
 
 function exec(finalize: ScriptFinalizer) {

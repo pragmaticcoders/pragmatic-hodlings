@@ -7,11 +7,11 @@ const host = 'localhost';
 const port = 8545;
 
 const defaults = {
-    from,
-    gas,
-    gasPrice,
-    host,
-    port
+  from,
+  gas,
+  gasPrice,
+  host,
+  port
 };
 
 export = {
@@ -23,7 +23,7 @@ export = {
     testrpc: {
       ...defaults,
       from: undefined,
-      network_id: '*',
+      network_id: '*'
     }
   }
 };

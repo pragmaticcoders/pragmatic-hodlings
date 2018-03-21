@@ -23,19 +23,22 @@ async function asyncExec() {
     throw new Error('data is not specified');
   }
 
-  let hodlersToRemove: Array<{ removeDay: number, index: number }> = [];
+  let hodlersToRemove: Array<{ removeDay: number; index: number }> = [];
   process.argv.forEach((item, idx) => {
     if (item === 'dataToRemove') {
       const rawData: number[][] = JSON.parse(process.argv[idx + 1]);
-      hodlersToRemove = rawData.reduce((acc, raw) => {
-        return [
-          ...acc,
-          {
-            index: raw[1],
-            removeDay: raw[0]
-          }
-        ];
-      }, [] as any[]);
+      hodlersToRemove = rawData.reduce(
+        (acc, raw) => {
+          return [
+            ...acc,
+            {
+              index: raw[1],
+              removeDay: raw[0]
+            }
+          ];
+        },
+        [] as any[]
+      );
     }
   });
 
