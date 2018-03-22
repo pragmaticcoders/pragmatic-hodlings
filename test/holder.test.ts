@@ -195,9 +195,10 @@ contract('PragmaticHodlings', accounts => {
       await hodlings.settleToken(token.address, { from: owner });
 
       for (const [idx, hodler] of hodlers.entries()) {
-        assertNumberEqual(
+        assertNumberAlmostEqual(
           await token.balanceOf(accounts[idx]),
-          hodler.expectedAmount
+          hodler.expectedAmount,
+          1
         );
       }
     }
