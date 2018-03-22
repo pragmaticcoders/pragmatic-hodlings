@@ -1,6 +1,6 @@
 {
   "name": "pragmatic-hodlings-contracts",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Pragmatic Hodlings contracts allows any organization to distribute it's tokens to all members according to their seniority",
   "main": "index.js",
   "scripts": {

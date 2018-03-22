@@ -15,6 +15,7 @@ import {
 import { BigNumber } from 'bignumber.js';
 import { ContractContextDefinition } from 'truffle';
 import {
+  assertNumberAlmostEqual,
   assertNumberEqual,
   assertReverts,
   findLastLog,
@@ -122,7 +123,8 @@ contract('PragmaticHodlings', accounts => {
       await testSettlement(hodlers);
     });
 
-    it('should transfer simple calculated proportions with new hodler', async () => {
+    it('should transfer simple calculated proportions' +
+      ' with new hodler', async () => {
       const transferAmount = new BigNumber(864);
       await setupAmountToSettle(transferAmount);
 
@@ -136,7 +138,8 @@ contract('PragmaticHodlings', accounts => {
       await testSettlement(hodlers);
     });
 
-    it('should transfer simple calculated proportions after delete hodler', async () => {
+    it('should transfer simple calculated proportions' +
+      ' after delete hodler', async () => {
       const transferAmount = new BigNumber(864);
       await setupAmountToSettle(transferAmount);
 
