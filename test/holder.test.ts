@@ -110,7 +110,7 @@ contract('PragmaticHodlings', accounts => {
       await testSettlement(hodlers);
     });
 
-    it('should transfer simple calculated proportions', async () => {
+    it('should transfer proportions', async () => {
       const transferAmount = new BigNumber(8640);
       await setupAmountToSettle(transferAmount);
 
@@ -123,8 +123,7 @@ contract('PragmaticHodlings', accounts => {
       await testSettlement(hodlers);
     });
 
-    it('should transfer simple calculated proportions' +
-      ' with new hodler', async () => {
+    it('should transfer proportions with new hodler', async () => {
       const transferAmount = new BigNumber(864);
       await setupAmountToSettle(transferAmount);
 
@@ -138,8 +137,7 @@ contract('PragmaticHodlings', accounts => {
       await testSettlement(hodlers);
     });
 
-    it('should transfer simple calculated proportions' +
-      ' after delete hodler', async () => {
+    it('should transfer proportions after delete hodler', async () => {
       const transferAmount = new BigNumber(864);
       await setupAmountToSettle(transferAmount);
 
@@ -356,8 +354,7 @@ interface Hodler {
 }
 
 class TestHodler {
-  constructor(public workedSeconds: number, public expectedAmount: number) {
-  }
+  constructor(public workedSeconds: number, public expectedAmount: number) {}
 }
 
 function parseHodlers(args: [Address[], BigNumber[]]): Hodler[] {
