@@ -60,7 +60,7 @@ contract PragmaticHodlings is Ownable {
 
     modifier onlyPast(uint32 timestamp) {
         // solhint-disable-next-line not-rely-on-time
-        require(now > timestamp);
+        require(getNow() > timestamp);
         _;
     }
 
@@ -150,7 +150,7 @@ contract PragmaticHodlings is Ownable {
         uint256 sum = 0;
         for (uint256 i = 0; i < temp.length; i++) {
             // solhint-disable-next-line not-rely-on-time
-            temp[i] = now.sub(hodlers.entries[i].joined);
+            temp[i] = getNow().sub(hodlers.entries[i].joined);
             sum = sum.add(temp[i]);
         }
 
@@ -198,5 +198,9 @@ contract PragmaticHodlings is Ownable {
         returns (bool)
     {
         return hodlers.contains(account);
+    }
+
+    function getNow() private view returns (uint){
+        return now;
     }
 }

@@ -104,6 +104,13 @@ declare module 'hodlings' {
       amount: BigNumber;
     }
 
+    interface PragmaticHodlingsTimeMocked extends PragmaticHodlings {
+      setNow(
+        currentTime: AnyNumber,
+        options?: TransactionOptions
+      ): Promise<void>;
+    }
+
     interface MigrationsContract extends Contract<Migrations> {
       'new'(options?: TransactionOptions): Promise<Migrations>;
     }
@@ -121,11 +128,18 @@ declare module 'hodlings' {
       'new'(options?: TransactionOptions): Promise<PragmaticHodlings>;
     }
 
+    interface PragmaticHodlingsTimeMockedContract
+      extends Contract<PragmaticHodlingsTimeMocked> {
+      'new'(options?: TransactionOptions): Promise<PragmaticHodlingsTimeMocked>;
+    }
+
     interface HodlingsArtifacts extends TruffleArtifacts {
       require(name: string): AnyContract;
       require(name: './Migrations.sol'): MigrationsContract;
       require(name: './TestToken.sol'): TestTokenContract;
       require(name: './PragmaticHodlings.sol'): PragmaticHodlingsContract;
+      require(name: './PragmaticHodlingsTimeMocked.sol')
+        : PragmaticHodlingsTimeMockedContract;
     }
   }
 
