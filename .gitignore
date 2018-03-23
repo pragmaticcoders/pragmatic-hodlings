@@ -1,3 +1,8 @@
+# Ignore build/contracts, but not ignore some artifacts
+build/contracts/*.json
+!build/contracts/PragmaticHodlings.json
+!build/contracts/Migrations.json
+
 # Compiled JS
 *.js
 
