@@ -365,11 +365,22 @@ contract('PragmaticHodlings', accounts => {
         await hodlings.settleToken(token.address, { from: owner });
 
         for (const [idx, hodler] of hodlers.entries()) {
+          /*
+          Probably its going to conflict here.
+          With current time-mockable contract this version is correct
+          remove this comment after merge
+           */
           assertNumberEqual(
             await token.balanceOf(accounts[idx]),
             hodler.expectedAmount
           );
         }
+
+        assertNumberEqual(
+          await token.balanceOf(hodlings.address),
+          0
+        );
+
       }
     });
   });
