@@ -65,7 +65,7 @@ library Helpers {
                 "Address should be equal"
             );
             Assert.equal(
-                uint(book.entries[i].joined),
+                uint(book.entries[i].joinDate),
                 uint(expectedTimestamps[i]),
                 "Timestamp should be equal"
             );
