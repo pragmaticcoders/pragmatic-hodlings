@@ -126,6 +126,7 @@ declare module 'hodlings' {
       require(name: './Migrations.sol'): MigrationsContract;
       require(name: './TestToken.sol'): TestTokenContract;
       require(name: './PragmaticHodlings.sol'): PragmaticHodlingsContract;
+      require(name: './MultiSigWallet.sol'): Contract<ContractBase>;
     }
   }
 
