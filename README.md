@@ -38,7 +38,7 @@ Member data are stored in array of `Member` structures.
 ```Solidity
 struct Member {
     address account;
-    uint32 joined;
+    uint64 joinDate;
 }
 ```
 

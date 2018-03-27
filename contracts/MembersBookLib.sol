@@ -15,7 +15,7 @@ library MembersBookLib {
      */
     struct Member {
         address account;
-        uint32 joined;
+        uint64 joinDate;
     }
 
     /**
@@ -28,12 +28,12 @@ library MembersBookLib {
     /**
      * @dev Adds new member to book
      * @param account address Member's address
-     * @param joined uint32 Member's joining timestamp
+     * @param joinDate uint64 Member's joining timestamp
      */
     function add(
         MembersBook storage self,
         address account,
-        uint32 joined
+        uint64 joinDate
     )
         internal
         returns (bool)
@@ -45,7 +45,7 @@ library MembersBookLib {
         self.entries.push(
             Member({
                 account: account,
-                joined: joined
+                joinDate: joinDate
             }));
 
         return true;

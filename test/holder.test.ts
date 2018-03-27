@@ -15,6 +15,7 @@ import {
 import { BigNumber } from 'bignumber.js';
 import { ContractContextDefinition } from 'truffle';
 import {
+  assertNumberAlmostEqual,
   assertNumberEqual,
   assertReverts,
   findLastLog,
@@ -109,7 +110,7 @@ contract('PragmaticHodlings', accounts => {
       await testSettlement(hodlers);
     });
 
-    it('should transfer simple calculated proportions', async () => {
+    it('should transfer proportions', async () => {
       const transferAmount = new BigNumber(8640);
       await setupAmountToSettle(transferAmount);
 
@@ -122,7 +123,7 @@ contract('PragmaticHodlings', accounts => {
       await testSettlement(hodlers);
     });
 
-    it('should transfer simple calculated proportions with new hodler', async () => {
+    it('should transfer proportions with new hodler', async () => {
       const transferAmount = new BigNumber(864);
       await setupAmountToSettle(transferAmount);
 
@@ -136,7 +137,7 @@ contract('PragmaticHodlings', accounts => {
       await testSettlement(hodlers);
     });
 
-    it('should transfer simple calculated proportions after delete hodler', async () => {
+    it('should transfer proportions after delete hodler', async () => {
       const transferAmount = new BigNumber(864);
       await setupAmountToSettle(transferAmount);
 
@@ -194,9 +195,10 @@ contract('PragmaticHodlings', accounts => {
       await hodlings.settleToken(token.address, { from: owner });
 
       for (const [idx, hodler] of hodlers.entries()) {
-        assertNumberEqual(
+        assertNumberAlmostEqual(
           await token.balanceOf(accounts[idx]),
-          hodler.expectedAmount
+          hodler.expectedAmount,
+          1
         );
       }
     }
@@ -213,7 +215,7 @@ contract('PragmaticHodlings', accounts => {
       );
       assertNumberEqual(currentHodlers.length, 1);
       assert.equal(currentHodlers[0].address, hodler);
-      assertNumberEqual(currentHodlers[0].joined, hodlerTimestamp);
+      assertNumberEqual(currentHodlers[0].joinDate, hodlerTimestamp);
     });
 
     it('Should emit HodlerAdded event', async () => {
@@ -228,17 +230,17 @@ contract('PragmaticHodlings', accounts => {
       const event = log.args as HodlerAddedEvent;
       assert.isOk(event);
       assert.equal(event.account, hodler);
-      assertNumberEqual(event.joined, new BigNumber(hodlerTimestamp));
+      assertNumberEqual(event.joinDate, new BigNumber(hodlerTimestamp));
     });
 
     it('Should add few hodlers', async () => {
       const hodlers: Hodler[] = accounts.map((address, idx): Hodler => ({
         address,
-        joined: new BigNumber(idx).add(1)
+        joinDate: new BigNumber(idx).add(1)
       }));
 
       await hodlers.forEach(async hodler => {
-        await hodlings.addHodler(hodler.address, hodler.joined, {
+        await hodlings.addHodler(hodler.address, hodler.joinDate, {
           from: owner
         });
       });
@@ -253,7 +255,7 @@ contract('PragmaticHodlings', accounts => {
         );
 
         assert.isOk(added);
-        assertNumberEqual(added!.joined, hodler.joined);
+        assertNumberEqual(added!.joinDate, hodler.joinDate);
       });
     });
 
@@ -349,12 +351,11 @@ contract('PragmaticHodlings', accounts => {
 
 interface Hodler {
   address: Address;
-  joined: AnyNumber;
+  joinDate: AnyNumber;
 }
 
 class TestHodler {
-  constructor(public workedSeconds: number, public expectedAmount: number) {
-  }
+  constructor(public workedSeconds: number, public expectedAmount: number) {}
 }
 
 function parseHodlers(args: [Address[], BigNumber[]]): Hodler[] {
@@ -364,7 +365,7 @@ function parseHodlers(args: [Address[], BigNumber[]]): Hodler[] {
   for (let i = 0; i < addresses.length; i++) {
     result[i] = {
       address: addresses[i],
-      joined: timestamps[i]
+      joinDate: timestamps[i]
     };
   }
   return result;

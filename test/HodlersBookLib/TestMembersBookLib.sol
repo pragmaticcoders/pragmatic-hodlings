@@ -102,8 +102,8 @@ contract TestMembersBookLib {
         add(ADDRESS_3, TIMESTAMP_3);
     }
 
-    function add(address account, uint32 joined) private {
-        bool added = book.add(account, joined);
+    function add(address account, uint32 joinDate) private {
+        bool added = book.add(account, joinDate);
         Assert.isTrue(added, "Should add");
     }
 

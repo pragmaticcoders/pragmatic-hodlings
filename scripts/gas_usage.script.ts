@@ -1,3 +1,4 @@
+/* tslint:disable:no-console */
 import { BigNumber } from 'bignumber.js';
 import { HodlingsArtifacts } from 'hodlings';
 import { ScriptFinalizer } from 'truffle';
