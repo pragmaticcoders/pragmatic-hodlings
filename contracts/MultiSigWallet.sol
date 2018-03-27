@@ -431,7 +431,7 @@ contract MultiSigWallet {
             value: value,
             data: data,
             executed: false
-            });
+        });
         transactionCount += 1;
 
         Submission(transactionId);

@@ -11,7 +11,7 @@ const initialHodlers: InitialHodler[] = [
   ['0x6b734e6151d6ca0b03eab35d48911f66fe6b3a90', '2016-01-02'],
   ['0xcba5a25918f46ea73f2640cecb8e0dda6cfec4ef', '2017-01-02'],
   ['0x4cbd4b81d620e71aded75e8a05f6c90e2f9aaa97', '2018-01-02']
-].map(arr => ({address: arr[0], joinDate: toTimestamp(arr[1])}));
+].map(arr => ({ address: arr[0], joinDate: toTimestamp(arr[1]) }));
 
 async function deploy() {
   const hodlings = await PragmaticHodlings.deployed();

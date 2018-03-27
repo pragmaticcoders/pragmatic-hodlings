@@ -56,7 +56,6 @@ library SafeMath {
 contract Ownable {
     address public owner;
 
-
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     /**
@@ -84,6 +83,7 @@ contract Ownable {
         OwnershipTransferred(owner, newOwner);
         owner = newOwner;
     }
+
 }
 
 
@@ -101,7 +101,7 @@ library MembersBookLib {
      */
     struct Member {
         address account;
-        uint32 joined;
+        uint64 joinDate;
     }
 
     /**
@@ -114,12 +114,12 @@ library MembersBookLib {
     /**
      * @dev Adds new member to book
      * @param account address Member's address
-     * @param joined uint32 Member's joining timestamp
+     * @param joinDate uint64 Member's joining timestamp
      */
     function add(
         MembersBook storage self,
         address account,
-        uint32 joined
+        uint64 joinDate
     )
         internal
         returns (bool)
@@ -130,9 +130,10 @@ library MembersBookLib {
 
         self.entries.push(
             Member({
-                account: account,
-                joined: joined
-            }));
+                account : account,
+                joinDate : joinDate
+            })
+        );
 
         return true;
     }
@@ -213,13 +214,14 @@ library MembersBookLib {
  */
 contract TransferableToken {
     function transfer(address to, uint256 amount) public;
+
     function balanceOf(address who) public view returns (uint256);
 }
 
 
 /**
  * @title Proportionally distribute contract's tokens to each registered hodler
- * @dev Proportion is calculated based on joined timestamp
+ * @dev Proportion is calculated based on join date timestamp
  * @dev Group of hodlers and settlements are managed by contract owner
  * @author Wojciech Harzowski (https://github.com/harzo)
  * @author Dominik Kroliczek (https://github.com/kruligh)
@@ -259,18 +261,18 @@ contract PragmaticHodlings is Ownable {
         _;
     }
 
-    modifier onlyPast(uint32 timestamp) {
+    modifier onlyPast(uint64 timestamp) {
         // solhint-disable-next-line not-rely-on-time
         require(now > timestamp);
         _;
     }
 
     /**
-    * @dev New hodler has been added to book
-    * @param account address Hodler's address
-    * @param joined uint32 Hodler's joining timestamp
-    */
-    event HodlerAdded(address account, uint32 joined);
+     * @dev New hodler has been added to book
+     * @param account address Hodler's address
+     * @param joinDate uint64 Hodler's joining timestamp
+     */
+    event HodlerAdded(address account, uint64 joinDate);
 
     /**
      * @dev Existing hodler has been removed
@@ -288,17 +290,17 @@ contract PragmaticHodlings is Ownable {
     /**
      * @dev Adds new hodler to book
      * @param account address Hodler's address
-     * @param joined uint32 Hodler's joining timestamp
+     * @param joinDate uint64 Hodler's joining timestamp
      */
-    function addHodler(address account, uint32 joined)
+    function addHodler(address account, uint64 joinDate)
         public
         onlyOwner
         onlyValidAddress(account)
         onlyNotExisting(account)
-        onlyPast(joined)
+        onlyPast(joinDate)
     {
-        hodlers.add(account, joined);
-        HodlerAdded(account, joined);
+        hodlers.add(account, joinDate);
+        HodlerAdded(account, joinDate);
     }
 
     /**
@@ -351,7 +353,7 @@ contract PragmaticHodlings is Ownable {
         uint256 sum = 0;
         for (uint256 i = 0; i < temp.length; i++) {
             // solhint-disable-next-line not-rely-on-time
-            temp[i] = now.sub(hodlers.entries[i].joined);
+            temp[i] = now.sub(hodlers.entries[i].joinDate);
             sum = sum.add(temp[i]);
         }
 
@@ -361,7 +363,7 @@ contract PragmaticHodlings is Ownable {
             sharesSum += temp[i];
         }
 
-        if (amount > sharesSum) { // undivided rest of token
+        if (amount > sharesSum) {// undivided rest of token
             temp[0] = temp[0].add(amount.sub(sharesSum));
         }
 
@@ -371,19 +373,19 @@ contract PragmaticHodlings is Ownable {
     /**
      * @dev Returns hodlers addresses with joining timestamps
      * @return address[] Addresses of hodlers
-     * @return uint32[] joining timestamps. Related by index with addresses
+     * @return uint64[] joining timestamps. Related by index with addresses
      */
     function getHodlers()
         public
         view
-        returns (address[], uint32[])
+        returns (address[], uint64[])
     {
         address[] memory hodlersAddresses = new address[](hodlers.entries.length);
-        uint32[] memory hodlersTimestamps = new uint32[](hodlers.entries.length);
+        uint64[] memory hodlersTimestamps = new uint64[](hodlers.entries.length);
 
         for (uint256 i = 0; i < hodlers.entries.length; i++) {
             hodlersAddresses[i] = hodlers.entries[i].account;
-            hodlersTimestamps[i] = hodlers.entries[i].joined;
+            hodlersTimestamps[i] = hodlers.entries[i].joinDate;
         }
 
         return (hodlersAddresses, hodlersTimestamps);
