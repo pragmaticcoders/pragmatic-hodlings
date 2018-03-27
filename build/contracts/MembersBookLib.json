@@ -1,0 +1,2562 @@
+{
+  "contractName": "MembersBookLib",
+  "abi": [],
+  "bytecode": "0x60606040523415600e57600080fd5b603580601b6000396000f3006060604052600080fd00a165627a7a72305820becc610805093596626b9c715cc4eae9377cdda44ccb0069f574e22f4b9b83640029",
+  "deployedBytecode": "0x6060604052600080fd00a165627a7a72305820becc610805093596626b9c715cc4eae9377cdda44ccb0069f574e22f4b9b83640029",
+  "sourceMap": "247:2544:0:-;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "247:2544:0:-;;;;;",
+  "source": "pragma solidity 0.4.19;\n\n\n/**\n * @title MembersBook library\n * @dev Allows to store and manage addresses of members in contract\n * @author Wojciech Harzowski (https://github.com/harzo)\n * @author Dominik Kroliczek (https://github.com/kruligh)\n */\nlibrary MembersBookLib {\n\n    /**\n     * @dev Represents member with its address and\n     * @dev joining to organization timestamp\n     */\n    struct Member {\n        address account;\n        uint64 joinDate;\n    }\n\n    /**\n     * @dev Represents set of members\n     */\n    struct MembersBook {\n        Member[] entries;\n    }\n\n    /**\n     * @dev Adds new member to book\n     * @param account address Member's address\n     * @param joinDate uint64 Member's joining timestamp\n     */\n    function add(\n        MembersBook storage self,\n        address account,\n        uint64 joinDate\n    )\n        internal\n        returns (bool)\n    {\n        if (account == address(0) || contains(self, account)) {\n            return false;\n        }\n\n        self.entries.push(\n            Member({\n                account: account,\n                joinDate: joinDate\n            }));\n\n        return true;\n    }\n\n    /**\n     * @dev Removes existing member from book\n     * @param account address Member's address whose should be removed\n     */\n    function remove(\n        MembersBook storage self,\n        address account\n    )\n        internal\n        returns (bool)\n    {\n        if (!contains(self, account)) {\n            return false;\n        } else {\n            uint256 entryIndex = index(self, account);\n            if (entryIndex < self.entries.length - 1) {\n                self.entries[entryIndex] = self.entries[self.entries.length - 1];\n            }\n\n            self.entries.length--;\n        }\n\n        return true;\n    }\n\n    /**\n     * @dev Checks if member address exists in book\n     * @param account address Address to check\n     * @return bool Address existence indicator\n     */\n    function contains(\n        MembersBook storage self,\n        address account\n    )\n        internal\n        view\n        returns (bool)\n    {\n        for (uint256 i = 0; i < self.entries.length; i++) {\n            if (self.entries[i].account == account) {\n                return true;\n            }\n        }\n        return false;\n    }\n\n    /**\n     * @dev Returns member index in book or reverts if doesn't exists\n     * @param account address Address to check\n     * @return uint256 Address index\n     */\n    function index(\n        MembersBook storage self,\n        address account\n    )\n        private\n        view\n        returns (uint256)\n    {\n        for (uint256 i = 0; i < self.entries.length; i++) {\n            if (self.entries[i].account == account) {\n                return i;\n            }\n        }\n        assert(false);\n    }\n}\n",
+  "sourcePath": "/home/kruligh/src/pragmatic-holdings/contracts/contracts/MembersBookLib.sol",
+  "ast": {
+    "attributes": {
+      "absolutePath": "/home/kruligh/src/pragmatic-holdings/contracts/contracts/MembersBookLib.sol",
+      "exportedSymbols": {
+        "MembersBookLib": [
+          186
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "0.4",
+            ".19"
+          ]
+        },
+        "id": 1,
+        "name": "PragmaDirective",
+        "src": "0:23:0"
+      },
+      {
+        "attributes": {
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "library",
+          "documentation": "@title MembersBook library\n@dev Allows to store and manage addresses of members in contract\n@author Wojciech Harzowski (https://github.com/harzo)\n@author Dominik Kroliczek (https://github.com/kruligh)",
+          "fullyImplemented": true,
+          "linearizedBaseContracts": [
+            186
+          ],
+          "name": "MembersBookLib",
+          "scope": 187
+        },
+        "children": [
+          {
+            "attributes": {
+              "canonicalName": "MembersBookLib.Member",
+              "name": "Member",
+              "scope": 186,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "constant": false,
+                  "name": "account",
+                  "scope": 6,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "address",
+                  "value": null,
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "address",
+                      "type": "address"
+                    },
+                    "id": 2,
+                    "name": "ElementaryTypeName",
+                    "src": "414:7:0"
+                  }
+                ],
+                "id": 3,
+                "name": "VariableDeclaration",
+                "src": "414:15:0"
+              },
+              {
+                "attributes": {
+                  "constant": false,
+                  "name": "joinDate",
+                  "scope": 6,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "uint64",
+                  "value": null,
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "name": "uint64",
+                      "type": "uint64"
+                    },
+                    "id": 4,
+                    "name": "ElementaryTypeName",
+                    "src": "439:6:0"
+                  }
+                ],
+                "id": 5,
+                "name": "VariableDeclaration",
+                "src": "439:15:0"
+              }
+            ],
+            "id": 6,
+            "name": "StructDefinition",
+            "src": "390:71:0"
+          },
+          {
+            "attributes": {
+              "canonicalName": "MembersBookLib.MembersBook",
+              "name": "MembersBook",
+              "scope": 186,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "constant": false,
+                  "name": "entries",
+                  "scope": 10,
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "type": "struct MembersBookLib.Member storage ref[] storage pointer",
+                  "value": null,
+                  "visibility": "internal"
+                },
+                "children": [
+                  {
+                    "attributes": {
+                      "length": null,
+                      "type": "struct MembersBookLib.Member storage ref[] storage pointer"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "Member",
+                          "referencedDeclaration": 6,
+                          "type": "struct MembersBookLib.Member storage pointer"
+                        },
+                        "id": 7,
+                        "name": "UserDefinedTypeName",
+                        "src": "550:6:0"
+                      }
+                    ],
+                    "id": 8,
+                    "name": "ArrayTypeName",
+                    "src": "550:8:0"
+                  }
+                ],
+                "id": 9,
+                "name": "VariableDeclaration",
+                "src": "550:16:0"
+              }
+            ],
+            "id": 10,
+            "name": "StructDefinition",
+            "src": "521:52:0"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "add",
+              "payable": false,
+              "scope": 186,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "self",
+                      "scope": 49,
+                      "stateVariable": false,
+                      "storageLocation": "storage",
+                      "type": "struct MembersBookLib.MembersBook storage pointer",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "MembersBook",
+                          "referencedDeclaration": 10,
+                          "type": "struct MembersBookLib.MembersBook storage pointer"
+                        },
+                        "id": 11,
+                        "name": "UserDefinedTypeName",
+                        "src": "757:11:0"
+                      }
+                    ],
+                    "id": 12,
+                    "name": "VariableDeclaration",
+                    "src": "757:24:0"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "account",
+                      "scope": 49,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 13,
+                        "name": "ElementaryTypeName",
+                        "src": "791:7:0"
+                      }
+                    ],
+                    "id": 14,
+                    "name": "VariableDeclaration",
+                    "src": "791:15:0"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "joinDate",
+                      "scope": 49,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint64",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint64",
+                          "type": "uint64"
+                        },
+                        "id": 15,
+                        "name": "ElementaryTypeName",
+                        "src": "816:6:0"
+                      }
+                    ],
+                    "id": 16,
+                    "name": "VariableDeclaration",
+                    "src": "816:15:0"
+                  }
+                ],
+                "id": 17,
+                "name": "ParameterList",
+                "src": "747:90:0"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 49,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 18,
+                        "name": "ElementaryTypeName",
+                        "src": "872:4:0"
+                      }
+                    ],
+                    "id": 19,
+                    "name": "VariableDeclaration",
+                    "src": "872:4:0"
+                  }
+                ],
+                "id": 20,
+                "name": "ParameterList",
+                "src": "871:6:0"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "falseBody": null
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "commonType": {
+                            "typeIdentifier": "t_bool",
+                            "typeString": "bool"
+                          },
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "||",
+                          "type": "bool"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "commonType": {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              },
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "operator": "==",
+                              "type": "bool"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 14,
+                                  "type": "address",
+                                  "value": "account"
+                                },
+                                "id": 21,
+                                "name": "Identifier",
+                                "src": "896:7:0"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "isStructConstructorCall": false,
+                                  "lValueRequested": false,
+                                  "names": [
+                                    null
+                                  ],
+                                  "type": "address",
+                                  "type_conversion": true
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": [
+                                        {
+                                          "typeIdentifier": "t_rational_0_by_1",
+                                          "typeString": "int_const 0"
+                                        }
+                                      ],
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": true,
+                                      "lValueRequested": false,
+                                      "type": "type(address)",
+                                      "value": "address"
+                                    },
+                                    "id": 22,
+                                    "name": "ElementaryTypeNameExpression",
+                                    "src": "907:7:0"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "hexvalue": "30",
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": true,
+                                      "lValueRequested": false,
+                                      "subdenomination": null,
+                                      "token": "number",
+                                      "type": "int_const 0",
+                                      "value": "0"
+                                    },
+                                    "id": 23,
+                                    "name": "Literal",
+                                    "src": "915:1:0"
+                                  }
+                                ],
+                                "id": 24,
+                                "name": "FunctionCall",
+                                "src": "907:10:0"
+                              }
+                            ],
+                            "id": 25,
+                            "name": "BinaryOperation",
+                            "src": "896:21:0"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "bool",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_struct$_MembersBook_$10_storage_ptr",
+                                      "typeString": "struct MembersBookLib.MembersBook storage pointer"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    }
+                                  ],
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 146,
+                                  "type": "function (struct MembersBookLib.MembersBook storage pointer,address) view returns (bool)",
+                                  "value": "contains"
+                                },
+                                "id": 26,
+                                "name": "Identifier",
+                                "src": "921:8:0"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 12,
+                                  "type": "struct MembersBookLib.MembersBook storage pointer",
+                                  "value": "self"
+                                },
+                                "id": 27,
+                                "name": "Identifier",
+                                "src": "930:4:0"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 14,
+                                  "type": "address",
+                                  "value": "account"
+                                },
+                                "id": 28,
+                                "name": "Identifier",
+                                "src": "936:7:0"
+                              }
+                            ],
+                            "id": 29,
+                            "name": "FunctionCall",
+                            "src": "921:23:0"
+                          }
+                        ],
+                        "id": 30,
+                        "name": "BinaryOperation",
+                        "src": "896:48:0"
+                      },
+                      {
+                        "children": [
+                          {
+                            "attributes": {
+                              "functionReturnParameters": 20
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "66616c7365",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "bool",
+                                  "type": "bool",
+                                  "value": "false"
+                                },
+                                "id": 31,
+                                "name": "Literal",
+                                "src": "967:5:0"
+                              }
+                            ],
+                            "id": 32,
+                            "name": "Return",
+                            "src": "960:12:0"
+                          }
+                        ],
+                        "id": 33,
+                        "name": "Block",
+                        "src": "946:37:0"
+                      }
+                    ],
+                    "id": 34,
+                    "name": "IfStatement",
+                    "src": "892:91:0"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "uint256",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_struct$_Member_$6_memory",
+                                  "typeString": "struct MembersBookLib.Member memory"
+                                }
+                              ],
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "push",
+                              "referencedDeclaration": null,
+                              "type": "function (struct MembersBookLib.Member storage ref) returns (uint256)"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "entries",
+                                  "referencedDeclaration": 9,
+                                  "type": "struct MembersBookLib.Member storage ref[] storage ref"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 12,
+                                      "type": "struct MembersBookLib.MembersBook storage pointer",
+                                      "value": "self"
+                                    },
+                                    "id": 35,
+                                    "name": "Identifier",
+                                    "src": "993:4:0"
+                                  }
+                                ],
+                                "id": 38,
+                                "name": "MemberAccess",
+                                "src": "993:12:0"
+                              }
+                            ],
+                            "id": 39,
+                            "name": "MemberAccess",
+                            "src": "993:17:0"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": true,
+                              "lValueRequested": false,
+                              "names": [
+                                "account",
+                                "joinDate"
+                              ],
+                              "type": "struct MembersBookLib.Member memory",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 6,
+                                  "type": "type(struct MembersBookLib.Member storage pointer)",
+                                  "value": "Member"
+                                },
+                                "id": 40,
+                                "name": "Identifier",
+                                "src": "1024:6:0"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 14,
+                                  "type": "address",
+                                  "value": "account"
+                                },
+                                "id": 41,
+                                "name": "Identifier",
+                                "src": "1058:7:0"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 16,
+                                  "type": "uint64",
+                                  "value": "joinDate"
+                                },
+                                "id": 42,
+                                "name": "Identifier",
+                                "src": "1093:8:0"
+                              }
+                            ],
+                            "id": 43,
+                            "name": "FunctionCall",
+                            "src": "1024:92:0"
+                          }
+                        ],
+                        "id": 44,
+                        "name": "FunctionCall",
+                        "src": "993:124:0"
+                      }
+                    ],
+                    "id": 45,
+                    "name": "ExpressionStatement",
+                    "src": "993:124:0"
+                  },
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 20
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "hexvalue": "74727565",
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "subdenomination": null,
+                          "token": "bool",
+                          "type": "bool",
+                          "value": "true"
+                        },
+                        "id": 46,
+                        "name": "Literal",
+                        "src": "1135:4:0"
+                      }
+                    ],
+                    "id": 47,
+                    "name": "Return",
+                    "src": "1128:11:0"
+                  }
+                ],
+                "id": 48,
+                "name": "Block",
+                "src": "882:264:0"
+              }
+            ],
+            "id": 49,
+            "name": "FunctionDefinition",
+            "src": "735:411:0"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "remove",
+              "payable": false,
+              "scope": 186,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "self",
+                      "scope": 109,
+                      "stateVariable": false,
+                      "storageLocation": "storage",
+                      "type": "struct MembersBookLib.MembersBook storage pointer",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "MembersBook",
+                          "referencedDeclaration": 10,
+                          "type": "struct MembersBookLib.MembersBook storage pointer"
+                        },
+                        "id": 50,
+                        "name": "UserDefinedTypeName",
+                        "src": "1310:11:0"
+                      }
+                    ],
+                    "id": 51,
+                    "name": "VariableDeclaration",
+                    "src": "1310:24:0"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "account",
+                      "scope": 109,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 52,
+                        "name": "ElementaryTypeName",
+                        "src": "1344:7:0"
+                      }
+                    ],
+                    "id": 53,
+                    "name": "VariableDeclaration",
+                    "src": "1344:15:0"
+                  }
+                ],
+                "id": 54,
+                "name": "ParameterList",
+                "src": "1300:65:0"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 109,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 55,
+                        "name": "ElementaryTypeName",
+                        "src": "1400:4:0"
+                      }
+                    ],
+                    "id": 56,
+                    "name": "VariableDeclaration",
+                    "src": "1400:4:0"
+                  }
+                ],
+                "id": 57,
+                "name": "ParameterList",
+                "src": "1399:6:0"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "!",
+                          "prefix": true,
+                          "type": "bool"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "bool",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_struct$_MembersBook_$10_storage_ptr",
+                                      "typeString": "struct MembersBookLib.MembersBook storage pointer"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    }
+                                  ],
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 146,
+                                  "type": "function (struct MembersBookLib.MembersBook storage pointer,address) view returns (bool)",
+                                  "value": "contains"
+                                },
+                                "id": 58,
+                                "name": "Identifier",
+                                "src": "1425:8:0"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 51,
+                                  "type": "struct MembersBookLib.MembersBook storage pointer",
+                                  "value": "self"
+                                },
+                                "id": 59,
+                                "name": "Identifier",
+                                "src": "1434:4:0"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 53,
+                                  "type": "address",
+                                  "value": "account"
+                                },
+                                "id": 60,
+                                "name": "Identifier",
+                                "src": "1440:7:0"
+                              }
+                            ],
+                            "id": 61,
+                            "name": "FunctionCall",
+                            "src": "1425:23:0"
+                          }
+                        ],
+                        "id": 62,
+                        "name": "UnaryOperation",
+                        "src": "1424:24:0"
+                      },
+                      {
+                        "children": [
+                          {
+                            "attributes": {
+                              "functionReturnParameters": 57
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "66616c7365",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "bool",
+                                  "type": "bool",
+                                  "value": "false"
+                                },
+                                "id": 63,
+                                "name": "Literal",
+                                "src": "1471:5:0"
+                              }
+                            ],
+                            "id": 64,
+                            "name": "Return",
+                            "src": "1464:12:0"
+                          }
+                        ],
+                        "id": 65,
+                        "name": "Block",
+                        "src": "1450:37:0"
+                      },
+                      {
+                        "children": [
+                          {
+                            "attributes": {
+                              "assignments": [
+                                67
+                              ]
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "constant": false,
+                                  "name": "entryIndex",
+                                  "scope": 109,
+                                  "stateVariable": false,
+                                  "storageLocation": "default",
+                                  "type": "uint256",
+                                  "value": null,
+                                  "visibility": "internal"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "name": "uint256",
+                                      "type": "uint256"
+                                    },
+                                    "id": 66,
+                                    "name": "ElementaryTypeName",
+                                    "src": "1507:7:0"
+                                  }
+                                ],
+                                "id": 67,
+                                "name": "VariableDeclaration",
+                                "src": "1507:18:0"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "isStructConstructorCall": false,
+                                  "lValueRequested": false,
+                                  "names": [
+                                    null
+                                  ],
+                                  "type": "uint256",
+                                  "type_conversion": false
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": [
+                                        {
+                                          "typeIdentifier": "t_struct$_MembersBook_$10_storage_ptr",
+                                          "typeString": "struct MembersBookLib.MembersBook storage pointer"
+                                        },
+                                        {
+                                          "typeIdentifier": "t_address",
+                                          "typeString": "address"
+                                        }
+                                      ],
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 185,
+                                      "type": "function (struct MembersBookLib.MembersBook storage pointer,address) view returns (uint256)",
+                                      "value": "index"
+                                    },
+                                    "id": 68,
+                                    "name": "Identifier",
+                                    "src": "1528:5:0"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 51,
+                                      "type": "struct MembersBookLib.MembersBook storage pointer",
+                                      "value": "self"
+                                    },
+                                    "id": 69,
+                                    "name": "Identifier",
+                                    "src": "1534:4:0"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 53,
+                                      "type": "address",
+                                      "value": "account"
+                                    },
+                                    "id": 70,
+                                    "name": "Identifier",
+                                    "src": "1540:7:0"
+                                  }
+                                ],
+                                "id": 71,
+                                "name": "FunctionCall",
+                                "src": "1528:20:0"
+                              }
+                            ],
+                            "id": 72,
+                            "name": "VariableDeclarationStatement",
+                            "src": "1507:41:0"
+                          },
+                          {
+                            "attributes": {
+                              "falseBody": null
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "commonType": {
+                                    "typeIdentifier": "t_uint256",
+                                    "typeString": "uint256"
+                                  },
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "operator": "<",
+                                  "type": "bool"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 67,
+                                      "type": "uint256",
+                                      "value": "entryIndex"
+                                    },
+                                    "id": 73,
+                                    "name": "Identifier",
+                                    "src": "1566:10:0"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "commonType": {
+                                        "typeIdentifier": "t_uint256",
+                                        "typeString": "uint256"
+                                      },
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": false,
+                                      "lValueRequested": false,
+                                      "operator": "-",
+                                      "type": "uint256"
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "isConstant": false,
+                                          "isLValue": true,
+                                          "isPure": false,
+                                          "lValueRequested": false,
+                                          "member_name": "length",
+                                          "referencedDeclaration": null,
+                                          "type": "uint256"
+                                        },
+                                        "children": [
+                                          {
+                                            "attributes": {
+                                              "argumentTypes": null,
+                                              "isConstant": false,
+                                              "isLValue": true,
+                                              "isPure": false,
+                                              "lValueRequested": false,
+                                              "member_name": "entries",
+                                              "referencedDeclaration": 9,
+                                              "type": "struct MembersBookLib.Member storage ref[] storage ref"
+                                            },
+                                            "children": [
+                                              {
+                                                "attributes": {
+                                                  "argumentTypes": null,
+                                                  "overloadedDeclarations": [
+                                                    null
+                                                  ],
+                                                  "referencedDeclaration": 51,
+                                                  "type": "struct MembersBookLib.MembersBook storage pointer",
+                                                  "value": "self"
+                                                },
+                                                "id": 74,
+                                                "name": "Identifier",
+                                                "src": "1579:4:0"
+                                              }
+                                            ],
+                                            "id": 75,
+                                            "name": "MemberAccess",
+                                            "src": "1579:12:0"
+                                          }
+                                        ],
+                                        "id": 76,
+                                        "name": "MemberAccess",
+                                        "src": "1579:19:0"
+                                      },
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "hexvalue": "31",
+                                          "isConstant": false,
+                                          "isLValue": false,
+                                          "isPure": true,
+                                          "lValueRequested": false,
+                                          "subdenomination": null,
+                                          "token": "number",
+                                          "type": "int_const 1",
+                                          "value": "1"
+                                        },
+                                        "id": 77,
+                                        "name": "Literal",
+                                        "src": "1601:1:0"
+                                      }
+                                    ],
+                                    "id": 78,
+                                    "name": "BinaryOperation",
+                                    "src": "1579:23:0"
+                                  }
+                                ],
+                                "id": 79,
+                                "name": "BinaryOperation",
+                                "src": "1566:36:0"
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "isConstant": false,
+                                          "isLValue": false,
+                                          "isPure": false,
+                                          "lValueRequested": false,
+                                          "operator": "=",
+                                          "type": "struct MembersBookLib.Member storage ref"
+                                        },
+                                        "children": [
+                                          {
+                                            "attributes": {
+                                              "argumentTypes": null,
+                                              "isConstant": false,
+                                              "isLValue": true,
+                                              "isPure": false,
+                                              "lValueRequested": true,
+                                              "type": "struct MembersBookLib.Member storage ref"
+                                            },
+                                            "children": [
+                                              {
+                                                "attributes": {
+                                                  "argumentTypes": null,
+                                                  "isConstant": false,
+                                                  "isLValue": true,
+                                                  "isPure": false,
+                                                  "lValueRequested": false,
+                                                  "member_name": "entries",
+                                                  "referencedDeclaration": 9,
+                                                  "type": "struct MembersBookLib.Member storage ref[] storage ref"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "attributes": {
+                                                      "argumentTypes": null,
+                                                      "overloadedDeclarations": [
+                                                        null
+                                                      ],
+                                                      "referencedDeclaration": 51,
+                                                      "type": "struct MembersBookLib.MembersBook storage pointer",
+                                                      "value": "self"
+                                                    },
+                                                    "id": 80,
+                                                    "name": "Identifier",
+                                                    "src": "1622:4:0"
+                                                  }
+                                                ],
+                                                "id": 83,
+                                                "name": "MemberAccess",
+                                                "src": "1622:12:0"
+                                              },
+                                              {
+                                                "attributes": {
+                                                  "argumentTypes": null,
+                                                  "overloadedDeclarations": [
+                                                    null
+                                                  ],
+                                                  "referencedDeclaration": 67,
+                                                  "type": "uint256",
+                                                  "value": "entryIndex"
+                                                },
+                                                "id": 82,
+                                                "name": "Identifier",
+                                                "src": "1635:10:0"
+                                              }
+                                            ],
+                                            "id": 84,
+                                            "name": "IndexAccess",
+                                            "src": "1622:24:0"
+                                          },
+                                          {
+                                            "attributes": {
+                                              "argumentTypes": null,
+                                              "isConstant": false,
+                                              "isLValue": true,
+                                              "isPure": false,
+                                              "lValueRequested": false,
+                                              "type": "struct MembersBookLib.Member storage ref"
+                                            },
+                                            "children": [
+                                              {
+                                                "attributes": {
+                                                  "argumentTypes": null,
+                                                  "isConstant": false,
+                                                  "isLValue": true,
+                                                  "isPure": false,
+                                                  "lValueRequested": false,
+                                                  "member_name": "entries",
+                                                  "referencedDeclaration": 9,
+                                                  "type": "struct MembersBookLib.Member storage ref[] storage ref"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "attributes": {
+                                                      "argumentTypes": null,
+                                                      "overloadedDeclarations": [
+                                                        null
+                                                      ],
+                                                      "referencedDeclaration": 51,
+                                                      "type": "struct MembersBookLib.MembersBook storage pointer",
+                                                      "value": "self"
+                                                    },
+                                                    "id": 85,
+                                                    "name": "Identifier",
+                                                    "src": "1649:4:0"
+                                                  }
+                                                ],
+                                                "id": 86,
+                                                "name": "MemberAccess",
+                                                "src": "1649:12:0"
+                                              },
+                                              {
+                                                "attributes": {
+                                                  "argumentTypes": null,
+                                                  "commonType": {
+                                                    "typeIdentifier": "t_uint256",
+                                                    "typeString": "uint256"
+                                                  },
+                                                  "isConstant": false,
+                                                  "isLValue": false,
+                                                  "isPure": false,
+                                                  "lValueRequested": false,
+                                                  "operator": "-",
+                                                  "type": "uint256"
+                                                },
+                                                "children": [
+                                                  {
+                                                    "attributes": {
+                                                      "argumentTypes": null,
+                                                      "isConstant": false,
+                                                      "isLValue": true,
+                                                      "isPure": false,
+                                                      "lValueRequested": false,
+                                                      "member_name": "length",
+                                                      "referencedDeclaration": null,
+                                                      "type": "uint256"
+                                                    },
+                                                    "children": [
+                                                      {
+                                                        "attributes": {
+                                                          "argumentTypes": null,
+                                                          "isConstant": false,
+                                                          "isLValue": true,
+                                                          "isPure": false,
+                                                          "lValueRequested": false,
+                                                          "member_name": "entries",
+                                                          "referencedDeclaration": 9,
+                                                          "type": "struct MembersBookLib.Member storage ref[] storage ref"
+                                                        },
+                                                        "children": [
+                                                          {
+                                                            "attributes": {
+                                                              "argumentTypes": null,
+                                                              "overloadedDeclarations": [
+                                                                null
+                                                              ],
+                                                              "referencedDeclaration": 51,
+                                                              "type": "struct MembersBookLib.MembersBook storage pointer",
+                                                              "value": "self"
+                                                            },
+                                                            "id": 87,
+                                                            "name": "Identifier",
+                                                            "src": "1662:4:0"
+                                                          }
+                                                        ],
+                                                        "id": 88,
+                                                        "name": "MemberAccess",
+                                                        "src": "1662:12:0"
+                                                      }
+                                                    ],
+                                                    "id": 89,
+                                                    "name": "MemberAccess",
+                                                    "src": "1662:19:0"
+                                                  },
+                                                  {
+                                                    "attributes": {
+                                                      "argumentTypes": null,
+                                                      "hexvalue": "31",
+                                                      "isConstant": false,
+                                                      "isLValue": false,
+                                                      "isPure": true,
+                                                      "lValueRequested": false,
+                                                      "subdenomination": null,
+                                                      "token": "number",
+                                                      "type": "int_const 1",
+                                                      "value": "1"
+                                                    },
+                                                    "id": 90,
+                                                    "name": "Literal",
+                                                    "src": "1684:1:0"
+                                                  }
+                                                ],
+                                                "id": 91,
+                                                "name": "BinaryOperation",
+                                                "src": "1662:23:0"
+                                              }
+                                            ],
+                                            "id": 92,
+                                            "name": "IndexAccess",
+                                            "src": "1649:37:0"
+                                          }
+                                        ],
+                                        "id": 93,
+                                        "name": "Assignment",
+                                        "src": "1622:64:0"
+                                      }
+                                    ],
+                                    "id": 94,
+                                    "name": "ExpressionStatement",
+                                    "src": "1622:64:0"
+                                  }
+                                ],
+                                "id": 95,
+                                "name": "Block",
+                                "src": "1604:97:0"
+                              }
+                            ],
+                            "id": 96,
+                            "name": "IfStatement",
+                            "src": "1562:139:0"
+                          },
+                          {
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "operator": "--",
+                                  "prefix": false,
+                                  "type": "uint256"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "isConstant": false,
+                                      "isLValue": true,
+                                      "isPure": false,
+                                      "lValueRequested": true,
+                                      "member_name": "length",
+                                      "referencedDeclaration": null,
+                                      "type": "uint256"
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "isConstant": false,
+                                          "isLValue": true,
+                                          "isPure": false,
+                                          "lValueRequested": false,
+                                          "member_name": "entries",
+                                          "referencedDeclaration": 9,
+                                          "type": "struct MembersBookLib.Member storage ref[] storage ref"
+                                        },
+                                        "children": [
+                                          {
+                                            "attributes": {
+                                              "argumentTypes": null,
+                                              "overloadedDeclarations": [
+                                                null
+                                              ],
+                                              "referencedDeclaration": 51,
+                                              "type": "struct MembersBookLib.MembersBook storage pointer",
+                                              "value": "self"
+                                            },
+                                            "id": 97,
+                                            "name": "Identifier",
+                                            "src": "1715:4:0"
+                                          }
+                                        ],
+                                        "id": 100,
+                                        "name": "MemberAccess",
+                                        "src": "1715:12:0"
+                                      }
+                                    ],
+                                    "id": 101,
+                                    "name": "MemberAccess",
+                                    "src": "1715:19:0"
+                                  }
+                                ],
+                                "id": 102,
+                                "name": "UnaryOperation",
+                                "src": "1715:21:0"
+                              }
+                            ],
+                            "id": 103,
+                            "name": "ExpressionStatement",
+                            "src": "1715:21:0"
+                          }
+                        ],
+                        "id": 104,
+                        "name": "Block",
+                        "src": "1493:254:0"
+                      }
+                    ],
+                    "id": 105,
+                    "name": "IfStatement",
+                    "src": "1420:327:0"
+                  },
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 57
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "hexvalue": "74727565",
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "subdenomination": null,
+                          "token": "bool",
+                          "type": "bool",
+                          "value": "true"
+                        },
+                        "id": 106,
+                        "name": "Literal",
+                        "src": "1764:4:0"
+                      }
+                    ],
+                    "id": 107,
+                    "name": "Return",
+                    "src": "1757:11:0"
+                  }
+                ],
+                "id": 108,
+                "name": "Block",
+                "src": "1410:365:0"
+              }
+            ],
+            "id": 109,
+            "name": "FunctionDefinition",
+            "src": "1285:490:0"
+          },
+          {
+            "attributes": {
+              "constant": true,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "contains",
+              "payable": false,
+              "scope": 186,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "self",
+                      "scope": 146,
+                      "stateVariable": false,
+                      "storageLocation": "storage",
+                      "type": "struct MembersBookLib.MembersBook storage pointer",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "MembersBook",
+                          "referencedDeclaration": 10,
+                          "type": "struct MembersBookLib.MembersBook storage pointer"
+                        },
+                        "id": 110,
+                        "name": "UserDefinedTypeName",
+                        "src": "1971:11:0"
+                      }
+                    ],
+                    "id": 111,
+                    "name": "VariableDeclaration",
+                    "src": "1971:24:0"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "account",
+                      "scope": 146,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 112,
+                        "name": "ElementaryTypeName",
+                        "src": "2005:7:0"
+                      }
+                    ],
+                    "id": 113,
+                    "name": "VariableDeclaration",
+                    "src": "2005:15:0"
+                  }
+                ],
+                "id": 114,
+                "name": "ParameterList",
+                "src": "1961:65:0"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 146,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 115,
+                        "name": "ElementaryTypeName",
+                        "src": "2074:4:0"
+                      }
+                    ],
+                    "id": 116,
+                    "name": "VariableDeclaration",
+                    "src": "2074:4:0"
+                  }
+                ],
+                "id": 117,
+                "name": "ParameterList",
+                "src": "2073:6:0"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "assignments": [
+                            119
+                          ]
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "constant": false,
+                              "name": "i",
+                              "scope": 146,
+                              "stateVariable": false,
+                              "storageLocation": "default",
+                              "type": "uint256",
+                              "value": null,
+                              "visibility": "internal"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "name": "uint256",
+                                  "type": "uint256"
+                                },
+                                "id": 118,
+                                "name": "ElementaryTypeName",
+                                "src": "2099:7:0"
+                              }
+                            ],
+                            "id": 119,
+                            "name": "VariableDeclaration",
+                            "src": "2099:9:0"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "hexvalue": "30",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "subdenomination": null,
+                              "token": "number",
+                              "type": "int_const 0",
+                              "value": "0"
+                            },
+                            "id": 120,
+                            "name": "Literal",
+                            "src": "2111:1:0"
+                          }
+                        ],
+                        "id": 121,
+                        "name": "VariableDeclarationStatement",
+                        "src": "2099:13:0"
+                      },
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "commonType": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          },
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "<",
+                          "type": "bool"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 119,
+                              "type": "uint256",
+                              "value": "i"
+                            },
+                            "id": 122,
+                            "name": "Identifier",
+                            "src": "2114:1:0"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "length",
+                              "referencedDeclaration": null,
+                              "type": "uint256"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "entries",
+                                  "referencedDeclaration": 9,
+                                  "type": "struct MembersBookLib.Member storage ref[] storage ref"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 111,
+                                      "type": "struct MembersBookLib.MembersBook storage pointer",
+                                      "value": "self"
+                                    },
+                                    "id": 123,
+                                    "name": "Identifier",
+                                    "src": "2118:4:0"
+                                  }
+                                ],
+                                "id": 124,
+                                "name": "MemberAccess",
+                                "src": "2118:12:0"
+                              }
+                            ],
+                            "id": 125,
+                            "name": "MemberAccess",
+                            "src": "2118:19:0"
+                          }
+                        ],
+                        "id": 126,
+                        "name": "BinaryOperation",
+                        "src": "2114:23:0"
+                      },
+                      {
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "operator": "++",
+                              "prefix": false,
+                              "type": "uint256"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 119,
+                                  "type": "uint256",
+                                  "value": "i"
+                                },
+                                "id": 127,
+                                "name": "Identifier",
+                                "src": "2139:1:0"
+                              }
+                            ],
+                            "id": 128,
+                            "name": "UnaryOperation",
+                            "src": "2139:3:0"
+                          }
+                        ],
+                        "id": 129,
+                        "name": "ExpressionStatement",
+                        "src": "2139:3:0"
+                      },
+                      {
+                        "children": [
+                          {
+                            "attributes": {
+                              "falseBody": null
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "commonType": {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                  },
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "operator": "==",
+                                  "type": "bool"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "isConstant": false,
+                                      "isLValue": true,
+                                      "isPure": false,
+                                      "lValueRequested": false,
+                                      "member_name": "account",
+                                      "referencedDeclaration": 3,
+                                      "type": "address"
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "isConstant": false,
+                                          "isLValue": true,
+                                          "isPure": false,
+                                          "lValueRequested": false,
+                                          "type": "struct MembersBookLib.Member storage ref"
+                                        },
+                                        "children": [
+                                          {
+                                            "attributes": {
+                                              "argumentTypes": null,
+                                              "isConstant": false,
+                                              "isLValue": true,
+                                              "isPure": false,
+                                              "lValueRequested": false,
+                                              "member_name": "entries",
+                                              "referencedDeclaration": 9,
+                                              "type": "struct MembersBookLib.Member storage ref[] storage ref"
+                                            },
+                                            "children": [
+                                              {
+                                                "attributes": {
+                                                  "argumentTypes": null,
+                                                  "overloadedDeclarations": [
+                                                    null
+                                                  ],
+                                                  "referencedDeclaration": 111,
+                                                  "type": "struct MembersBookLib.MembersBook storage pointer",
+                                                  "value": "self"
+                                                },
+                                                "id": 130,
+                                                "name": "Identifier",
+                                                "src": "2162:4:0"
+                                              }
+                                            ],
+                                            "id": 131,
+                                            "name": "MemberAccess",
+                                            "src": "2162:12:0"
+                                          },
+                                          {
+                                            "attributes": {
+                                              "argumentTypes": null,
+                                              "overloadedDeclarations": [
+                                                null
+                                              ],
+                                              "referencedDeclaration": 119,
+                                              "type": "uint256",
+                                              "value": "i"
+                                            },
+                                            "id": 132,
+                                            "name": "Identifier",
+                                            "src": "2175:1:0"
+                                          }
+                                        ],
+                                        "id": 133,
+                                        "name": "IndexAccess",
+                                        "src": "2162:15:0"
+                                      }
+                                    ],
+                                    "id": 134,
+                                    "name": "MemberAccess",
+                                    "src": "2162:23:0"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 113,
+                                      "type": "address",
+                                      "value": "account"
+                                    },
+                                    "id": 135,
+                                    "name": "Identifier",
+                                    "src": "2189:7:0"
+                                  }
+                                ],
+                                "id": 136,
+                                "name": "BinaryOperation",
+                                "src": "2162:34:0"
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "functionReturnParameters": 117
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "hexvalue": "74727565",
+                                          "isConstant": false,
+                                          "isLValue": false,
+                                          "isPure": true,
+                                          "lValueRequested": false,
+                                          "subdenomination": null,
+                                          "token": "bool",
+                                          "type": "bool",
+                                          "value": "true"
+                                        },
+                                        "id": 137,
+                                        "name": "Literal",
+                                        "src": "2223:4:0"
+                                      }
+                                    ],
+                                    "id": 138,
+                                    "name": "Return",
+                                    "src": "2216:11:0"
+                                  }
+                                ],
+                                "id": 139,
+                                "name": "Block",
+                                "src": "2198:44:0"
+                              }
+                            ],
+                            "id": 140,
+                            "name": "IfStatement",
+                            "src": "2158:84:0"
+                          }
+                        ],
+                        "id": 141,
+                        "name": "Block",
+                        "src": "2144:108:0"
+                      }
+                    ],
+                    "id": 142,
+                    "name": "ForStatement",
+                    "src": "2094:158:0"
+                  },
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 117
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "hexvalue": "66616c7365",
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "subdenomination": null,
+                          "token": "bool",
+                          "type": "bool",
+                          "value": "false"
+                        },
+                        "id": 143,
+                        "name": "Literal",
+                        "src": "2268:5:0"
+                      }
+                    ],
+                    "id": 144,
+                    "name": "Return",
+                    "src": "2261:12:0"
+                  }
+                ],
+                "id": 145,
+                "name": "Block",
+                "src": "2084:196:0"
+              }
+            ],
+            "id": 146,
+            "name": "FunctionDefinition",
+            "src": "1944:336:0"
+          },
+          {
+            "attributes": {
+              "constant": true,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "index",
+              "payable": false,
+              "scope": 186,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "private"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "self",
+                      "scope": 185,
+                      "stateVariable": false,
+                      "storageLocation": "storage",
+                      "type": "struct MembersBookLib.MembersBook storage pointer",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "MembersBook",
+                          "referencedDeclaration": 10,
+                          "type": "struct MembersBookLib.MembersBook storage pointer"
+                        },
+                        "id": 147,
+                        "name": "UserDefinedTypeName",
+                        "src": "2480:11:0"
+                      }
+                    ],
+                    "id": 148,
+                    "name": "VariableDeclaration",
+                    "src": "2480:24:0"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "account",
+                      "scope": 185,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 149,
+                        "name": "ElementaryTypeName",
+                        "src": "2514:7:0"
+                      }
+                    ],
+                    "id": 150,
+                    "name": "VariableDeclaration",
+                    "src": "2514:15:0"
+                  }
+                ],
+                "id": 151,
+                "name": "ParameterList",
+                "src": "2470:65:0"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 185,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint256",
+                          "type": "uint256"
+                        },
+                        "id": 152,
+                        "name": "ElementaryTypeName",
+                        "src": "2582:7:0"
+                      }
+                    ],
+                    "id": 153,
+                    "name": "VariableDeclaration",
+                    "src": "2582:7:0"
+                  }
+                ],
+                "id": 154,
+                "name": "ParameterList",
+                "src": "2581:9:0"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "assignments": [
+                            156
+                          ]
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "constant": false,
+                              "name": "i",
+                              "scope": 185,
+                              "stateVariable": false,
+                              "storageLocation": "default",
+                              "type": "uint256",
+                              "value": null,
+                              "visibility": "internal"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "name": "uint256",
+                                  "type": "uint256"
+                                },
+                                "id": 155,
+                                "name": "ElementaryTypeName",
+                                "src": "2610:7:0"
+                              }
+                            ],
+                            "id": 156,
+                            "name": "VariableDeclaration",
+                            "src": "2610:9:0"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "hexvalue": "30",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "subdenomination": null,
+                              "token": "number",
+                              "type": "int_const 0",
+                              "value": "0"
+                            },
+                            "id": 157,
+                            "name": "Literal",
+                            "src": "2622:1:0"
+                          }
+                        ],
+                        "id": 158,
+                        "name": "VariableDeclarationStatement",
+                        "src": "2610:13:0"
+                      },
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "commonType": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          },
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "<",
+                          "type": "bool"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 156,
+                              "type": "uint256",
+                              "value": "i"
+                            },
+                            "id": 159,
+                            "name": "Identifier",
+                            "src": "2625:1:0"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "length",
+                              "referencedDeclaration": null,
+                              "type": "uint256"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "entries",
+                                  "referencedDeclaration": 9,
+                                  "type": "struct MembersBookLib.Member storage ref[] storage ref"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 148,
+                                      "type": "struct MembersBookLib.MembersBook storage pointer",
+                                      "value": "self"
+                                    },
+                                    "id": 160,
+                                    "name": "Identifier",
+                                    "src": "2629:4:0"
+                                  }
+                                ],
+                                "id": 161,
+                                "name": "MemberAccess",
+                                "src": "2629:12:0"
+                              }
+                            ],
+                            "id": 162,
+                            "name": "MemberAccess",
+                            "src": "2629:19:0"
+                          }
+                        ],
+                        "id": 163,
+                        "name": "BinaryOperation",
+                        "src": "2625:23:0"
+                      },
+                      {
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "operator": "++",
+                              "prefix": false,
+                              "type": "uint256"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 156,
+                                  "type": "uint256",
+                                  "value": "i"
+                                },
+                                "id": 164,
+                                "name": "Identifier",
+                                "src": "2650:1:0"
+                              }
+                            ],
+                            "id": 165,
+                            "name": "UnaryOperation",
+                            "src": "2650:3:0"
+                          }
+                        ],
+                        "id": 166,
+                        "name": "ExpressionStatement",
+                        "src": "2650:3:0"
+                      },
+                      {
+                        "children": [
+                          {
+                            "attributes": {
+                              "falseBody": null
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "commonType": {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                  },
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "operator": "==",
+                                  "type": "bool"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "isConstant": false,
+                                      "isLValue": true,
+                                      "isPure": false,
+                                      "lValueRequested": false,
+                                      "member_name": "account",
+                                      "referencedDeclaration": 3,
+                                      "type": "address"
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "isConstant": false,
+                                          "isLValue": true,
+                                          "isPure": false,
+                                          "lValueRequested": false,
+                                          "type": "struct MembersBookLib.Member storage ref"
+                                        },
+                                        "children": [
+                                          {
+                                            "attributes": {
+                                              "argumentTypes": null,
+                                              "isConstant": false,
+                                              "isLValue": true,
+                                              "isPure": false,
+                                              "lValueRequested": false,
+                                              "member_name": "entries",
+                                              "referencedDeclaration": 9,
+                                              "type": "struct MembersBookLib.Member storage ref[] storage ref"
+                                            },
+                                            "children": [
+                                              {
+                                                "attributes": {
+                                                  "argumentTypes": null,
+                                                  "overloadedDeclarations": [
+                                                    null
+                                                  ],
+                                                  "referencedDeclaration": 148,
+                                                  "type": "struct MembersBookLib.MembersBook storage pointer",
+                                                  "value": "self"
+                                                },
+                                                "id": 167,
+                                                "name": "Identifier",
+                                                "src": "2673:4:0"
+                                              }
+                                            ],
+                                            "id": 168,
+                                            "name": "MemberAccess",
+                                            "src": "2673:12:0"
+                                          },
+                                          {
+                                            "attributes": {
+                                              "argumentTypes": null,
+                                              "overloadedDeclarations": [
+                                                null
+                                              ],
+                                              "referencedDeclaration": 156,
+                                              "type": "uint256",
+                                              "value": "i"
+                                            },
+                                            "id": 169,
+                                            "name": "Identifier",
+                                            "src": "2686:1:0"
+                                          }
+                                        ],
+                                        "id": 170,
+                                        "name": "IndexAccess",
+                                        "src": "2673:15:0"
+                                      }
+                                    ],
+                                    "id": 171,
+                                    "name": "MemberAccess",
+                                    "src": "2673:23:0"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 150,
+                                      "type": "address",
+                                      "value": "account"
+                                    },
+                                    "id": 172,
+                                    "name": "Identifier",
+                                    "src": "2700:7:0"
+                                  }
+                                ],
+                                "id": 173,
+                                "name": "BinaryOperation",
+                                "src": "2673:34:0"
+                              },
+                              {
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "functionReturnParameters": 154
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "overloadedDeclarations": [
+                                            null
+                                          ],
+                                          "referencedDeclaration": 156,
+                                          "type": "uint256",
+                                          "value": "i"
+                                        },
+                                        "id": 174,
+                                        "name": "Identifier",
+                                        "src": "2734:1:0"
+                                      }
+                                    ],
+                                    "id": 175,
+                                    "name": "Return",
+                                    "src": "2727:8:0"
+                                  }
+                                ],
+                                "id": 176,
+                                "name": "Block",
+                                "src": "2709:41:0"
+                              }
+                            ],
+                            "id": 177,
+                            "name": "IfStatement",
+                            "src": "2669:81:0"
+                          }
+                        ],
+                        "id": 178,
+                        "name": "Block",
+                        "src": "2655:105:0"
+                      }
+                    ],
+                    "id": 179,
+                    "name": "ForStatement",
+                    "src": "2605:155:0"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bool",
+                                  "typeString": "bool"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 2433,
+                              "type": "function (bool) pure",
+                              "value": "assert"
+                            },
+                            "id": 180,
+                            "name": "Identifier",
+                            "src": "2769:6:0"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "hexvalue": "66616c7365",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "subdenomination": null,
+                              "token": "bool",
+                              "type": "bool",
+                              "value": "false"
+                            },
+                            "id": 181,
+                            "name": "Literal",
+                            "src": "2776:5:0"
+                          }
+                        ],
+                        "id": 182,
+                        "name": "FunctionCall",
+                        "src": "2769:13:0"
+                      }
+                    ],
+                    "id": 183,
+                    "name": "ExpressionStatement",
+                    "src": "2769:13:0"
+                  }
+                ],
+                "id": 184,
+                "name": "Block",
+                "src": "2595:194:0"
+              }
+            ],
+            "id": 185,
+            "name": "FunctionDefinition",
+            "src": "2456:333:0"
+          }
+        ],
+        "id": 186,
+        "name": "ContractDefinition",
+        "src": "247:2544:0"
+      }
+    ],
+    "id": 187,
+    "name": "SourceUnit",
+    "src": "0:2792:0"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.19+commit.c4cbbb05.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "1.0.1",
+  "updatedAt": "2018-03-27T09:03:46.763Z"
+}
