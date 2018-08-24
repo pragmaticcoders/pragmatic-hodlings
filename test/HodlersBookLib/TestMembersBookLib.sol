@@ -1,4 +1,4 @@
-pragma solidity 0.4.19;
+pragma solidity 0.4.24;
 
 import "truffle/Assert.sol";
 import { MembersBookLib } from "../../contracts/MembersBookLib.sol";

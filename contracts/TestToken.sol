@@ -1,4 +1,4 @@
-pragma solidity 0.4.19;
+pragma solidity 0.4.24;
 
 import { MintableToken } from "zeppelin-solidity/contracts/token/ERC20/MintableToken.sol";
 
@@ -19,7 +19,7 @@ contract TestToken is MintableToken {
         _;
     }
 
-    function TestToken(
+    constructor(
         string _name,
         string _symbol,
         uint256 _totalSupply
