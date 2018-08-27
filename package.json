@@ -1,6 +1,6 @@
 {
   "name": "pragmatic-hodlings-contracts",
-  "version": "0.9.1",
+  "version": "1.0.0",
   "description": "Pragmatic Hodlings contracts allows any organization to distribute it's tokens to all members according to their seniority",
   "main": "index.js",
   "scripts": {
@@ -9,10 +9,19 @@
     "compile:ts": "tsc",
     "test": "run-s compile:ts test:js",
     "test:js": "truffle test",
-    "lint": "run-p -c --aggregate-output lint:solhint lint:tslint",
+    "develop": "truffle develop",
+    "testrpc": "ganache-cli --blocktime 5 --networkId 4447 --mnemonic 'candy maple cake sugar pudding cream honey rich smooth crumble sweet treat' --port 9545",
+    "migrate:dev": "run-s compile:ts migrate:dev:js",
+    "migrate:dev:js": "truffle migrate --reset --network dev",
+    "migrate:rinkeby": "run-s compile:ts migrate:rinkeby:js",
+    "migrate:rinkeby:js": "truffle migrate --network rinkeby",
+    "migrate:rinkeby:reset": "run-s compile:ts migrate:rinkeby:reset:js",
+    "migrate:rinkeby:reset:js": "truffle migrate --network rinkeby --reset",
+    "lint": "run-p -c --aggregate-output lint:solhint lint:solium lint:tslint",
     "lint:tslint": "tslint --project .",
     "lint:tslint:fix": "tslint --fix --project .",
     "lint:solhint": "solhint \"contracts/**/*.sol\" \"build/flat/*.sol\"",
+    "lint:solium": "solium -d contracts",
     "format": "prettier --write \"**/*.ts\"",
     "calculate_token_shares": "npm run compile:ts && truffle exec scripts/token_shares.script.js --network testrpc",
     "gas_usage": "npm run compile:ts && truffle exec scripts/gas_usage.script.js --network testrpc"
@@ -28,22 +37,23 @@
     "Dominik Kroliczek (https://github.com/kruligh)"
   ],
   "devDependencies": {
-    "@types/chai": "^4.0.8",
-    "@types/mocha": "^2.2.44",
-    "@types/node": "^8.0.57",
-    "@types/ramda": "^0.25.8",
+    "@types/chai": "^4.1.4",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.5.7",
+    "@types/ramda": "^0.25.36",
     "bignumber.js": "^5.0.0",
     "chai": "^4.1.2",
     "fs": "0.0.1-security",
-    "npm-run-all": "^4.1.2",
-    "prettier": "^1.9.2",
+    "npm-run-all": "^4.1.3",
+    "prettier": "^1.14.0",
     "ramda": "^0.25.0",
-    "solhint": "^1.1.10",
-    "truffle": "4.0.6",
-    "tslint": "^5.8.0",
-    "typescript": "^2.6.2"
+    "solhint": "^1.2.1",
+    "solium": "^1.1.8",
+    "truffle": "^4.1.13",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.1"
   },
   "dependencies": {
-    "zeppelin-solidity": "^1.7.0"
+    "zeppelin-solidity": "^1.11.0"
   }
 }

@@ -234,10 +234,12 @@ contract('PragmaticHodlings', accounts => {
     });
 
     it('Should add few hodlers', async () => {
-      const hodlers: Hodler[] = accounts.map((address, idx): Hodler => ({
-        address,
-        joinDate: new BigNumber(idx).add(1)
-      }));
+      const hodlers: Hodler[] = accounts.map(
+        (address, idx): Hodler => ({
+          address,
+          joinDate: new BigNumber(idx).add(1)
+        })
+      );
 
       await hodlers.forEach(async hodler => {
         await hodlings.addHodler(hodler.address, hodler.joinDate, {

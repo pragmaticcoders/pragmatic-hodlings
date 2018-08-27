@@ -1,4 +1,4 @@
-pragma solidity 0.4.19;
+pragma solidity 0.4.24;
 
 import { Ownable } from "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import { SafeMath } from "zeppelin-solidity/contracts/math/SafeMath.sol";
@@ -59,7 +59,8 @@ contract PragmaticHodlings is Ownable {
     }
 
     modifier onlyPast(uint64 timestamp) {
-        // solhint-disable-next-line not-rely-on-time
+        // solhint-disable not-rely-on-time
+        // solium-disable-next-line security/no-block-members
         require(now > timestamp);
         _;
     }
@@ -97,7 +98,7 @@ contract PragmaticHodlings is Ownable {
         onlyPast(joinDate)
     {
         hodlers.add(account, joinDate);
-        HodlerAdded(account, joinDate);
+        emit HodlerAdded(account, joinDate);
     }
 
     /**
@@ -111,7 +112,7 @@ contract PragmaticHodlings is Ownable {
         onlyExisting(account)
     {
         hodlers.remove(account);
-        HodlerRemoved(account);
+        emit HodlerRemoved(account);
     }
 
     /**
@@ -132,7 +133,7 @@ contract PragmaticHodlings is Ownable {
             token.transfer(hodlers.entries[i].account, tokenShares[i]);
         }
 
-        TokenSettled(token, tokenAmount);
+        emit TokenSettled(token, tokenAmount);
     }
 
     /**
@@ -149,7 +150,7 @@ contract PragmaticHodlings is Ownable {
 
         uint256 sum = 0;
         for (uint256 i = 0; i < temp.length; i++) {
-            // solhint-disable-next-line not-rely-on-time
+            // solium-disable-next-line security/no-block-members
             temp[i] = now.sub(hodlers.entries[i].joinDate);
             sum = sum.add(temp[i]);
         }
