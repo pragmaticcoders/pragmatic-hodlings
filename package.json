@@ -11,12 +11,15 @@
     "test:js": "truffle test",
     "develop": "truffle develop",
     "testrpc": "ganache-cli --blocktime 5 --networkId 4447 --mnemonic 'candy maple cake sugar pudding cream honey rich smooth crumble sweet treat' --port 9545",
+    "migrate:parseInitialCSV": "node ./scripts/parseInitialHodlers.js",
     "migrate:dev": "run-s compile:ts migrate:dev:js",
     "migrate:dev:js": "truffle migrate --reset --network dev",
     "migrate:rinkeby": "run-s compile:ts migrate:rinkeby:js",
     "migrate:rinkeby:js": "truffle migrate --network rinkeby",
     "migrate:rinkeby:reset": "run-s compile:ts migrate:rinkeby:reset:js",
     "migrate:rinkeby:reset:js": "truffle migrate --network rinkeby --reset",
+    "migrate:mainnet": "run-s compile:ts migrate:mainnet:js",
+    "migrate:mainnet:js": "truffle migrate --network mainnet",
     "lint": "run-p -c --aggregate-output lint:solhint lint:solium lint:tslint",
     "lint:tslint": "tslint --project .",
     "lint:tslint:fix": "tslint --fix --project .",
@@ -41,6 +44,7 @@
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.5.7",
     "@types/ramda": "^0.25.36",
+    "@types/yargs": "^11.1.1",
     "bignumber.js": "^5.0.0",
     "chai": "^4.1.2",
     "fs": "0.0.1-security",
@@ -54,6 +58,8 @@
     "typescript": "^3.0.1"
   },
   "dependencies": {
+    "truffle-privatekey-provider": "^0.1.0",
+    "yargs": "^12.0.1",
     "zeppelin-solidity": "^1.11.0"
   }
 }
