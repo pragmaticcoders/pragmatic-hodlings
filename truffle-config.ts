@@ -5,6 +5,8 @@ const gas = 3000000;
 const gasPrice = fromGwei(14);
 const host = 'localhost';
 const port = 8545;
+const defaultPrivateKey =
+  '14BF88C8050969738B4949E43C1124F6CE71F5DF1E9C3ADA6A4107B9C12AE256';
 
 const defaults = {
   gas,
@@ -19,7 +21,7 @@ export = {
       ...defaults,
       network_id: '1',
       provider: new PrivateKeyProvider(
-        process.env.PRIVATE_KEY!,
+        process.env.PRIVATE_KEY || defaultPrivateKey,
         'https://infura.io/',
       )
     },
@@ -32,7 +34,7 @@ export = {
       ...defaults,
       network_id: '2',
       provider: new PrivateKeyProvider(
-        process.env.PRIVATE_KEY!,
+        process.env.PRIVATE_KEY || defaultPrivateKey,
         'https://ropsten.infura.io/',
       )
     },
