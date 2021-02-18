@@ -1,52 +1,6 @@
-pragma solidity 0.4.19;
+pragma solidity 0.4.24;
 
-
-/**
- * @title SafeMath
- * @dev Math operations with safety checks that throw on error
- */
-library SafeMath {
-
-    /**
-     * @dev Multiplies two numbers, throws on overflow.
-     */
-    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
-        if (a == 0) {
-            return 0;
-        }
-        uint256 c = a * b;
-        assert(c / a == b);
-        return c;
-    }
-
-    /**
-     * @dev Integer division of two numbers, truncating the quotient.
-     */
-    function div(uint256 a, uint256 b) internal pure returns (uint256) {
-        // assert(b > 0); // Solidity automatically throws when dividing by 0
-        uint256 c = a / b;
-        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
-        return c;
-    }
-
-    /**
-     * @dev Substracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
-     */
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        assert(b <= a);
-        return a - b;
-    }
-
-    /**
-     * @dev Adds two numbers, throws on overflow.
-     */
-    function add(uint256 a, uint256 b) internal pure returns (uint256) {
-        uint256 c = a + b;
-        assert(c >= a);
-        return c;
-    }
-}
-
+// File: zeppelin-solidity/contracts/ownership/Ownable.sol
 
 /**
  * @title Ownable
@@ -57,13 +11,18 @@ contract Ownable {
     address public owner;
 
 
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event OwnershipRenounced(address indexed previousOwner);
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
+
 
     /**
      * @dev The Ownable constructor sets the original `owner` of the contract to the sender
      * account.
      */
-    function Ownable() public {
+    constructor() public {
         owner = msg.sender;
     }
 
@@ -76,16 +35,88 @@ contract Ownable {
     }
 
     /**
-     * @dev Allows the current owner to transfer control of the contract to a newOwner.
-     * @param newOwner The address to transfer ownership to.
+     * @dev Allows the current owner to relinquish control of the contract.
+     * @notice Renouncing to ownership will leave the contract without an owner.
+     * It will not be possible to call the functions with the `onlyOwner`
+     * modifier anymore.
      */
-    function transferOwnership(address newOwner) public onlyOwner {
-        require(newOwner != address(0));
-        OwnershipTransferred(owner, newOwner);
-        owner = newOwner;
+    function renounceOwnership() public onlyOwner {
+        emit OwnershipRenounced(owner);
+        owner = address(0);
+    }
+
+    /**
+     * @dev Allows the current owner to transfer control of the contract to a newOwner.
+     * @param _newOwner The address to transfer ownership to.
+     */
+    function transferOwnership(address _newOwner) public onlyOwner {
+        _transferOwnership(_newOwner);
+    }
+
+    /**
+     * @dev Transfers control of the contract to a newOwner.
+     * @param _newOwner The address to transfer ownership to.
+     */
+    function _transferOwnership(address _newOwner) internal {
+        require(_newOwner != address(0));
+        emit OwnershipTransferred(owner, _newOwner);
+        owner = _newOwner;
     }
 }
 
+// File: zeppelin-solidity/contracts/math/SafeMath.sol
+
+/**
+ * @title SafeMath
+ * @dev Math operations with safety checks that throw on error
+ */
+library SafeMath {
+
+    /**
+    * @dev Multiplies two numbers, throws on overflow.
+    */
+    function mul(uint256 _a, uint256 _b) internal pure returns (uint256 c) {
+        // Gas optimization: this is cheaper than asserting 'a' not being zero, but the
+        // benefit is lost if 'b' is also tested.
+        // See: https://github.com/OpenZeppelin/openzeppelin-solidity/pull/522
+        if (_a == 0) {
+            return 0;
+        }
+
+        c = _a * _b;
+        assert(c / _a == _b);
+        return c;
+    }
+
+    /**
+    * @dev Integer division of two numbers, truncating the quotient.
+    */
+    function div(uint256 _a, uint256 _b) internal pure returns (uint256) {
+        // assert(_b > 0); // Solidity automatically throws when dividing by 0
+        // uint256 c = _a / _b;
+        // assert(_a == _b * c + _a % _b); // There is no case in which this doesn't hold
+        return _a / _b;
+    }
+
+    /**
+    * @dev Subtracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
+    */
+    function sub(uint256 _a, uint256 _b) internal pure returns (uint256) {
+        assert(_b <= _a);
+        return _a - _b;
+    }
+
+    /**
+    * @dev Adds two numbers, throws on overflow.
+    */
+    function add(uint256 _a, uint256 _b) internal pure returns (uint256 c) {
+        c = _a + _b;
+        assert(c >= _a);
+        return c;
+    }
+}
+
+// File: contracts/MembersBookLib.sol
 
 /**
  * @title MembersBook library
@@ -101,7 +132,7 @@ library MembersBookLib {
      */
     struct Member {
         address account;
-        uint32 joined;
+        uint64 joinDate;
     }
 
     /**
@@ -114,15 +145,15 @@ library MembersBookLib {
     /**
      * @dev Adds new member to book
      * @param account address Member's address
-     * @param joined uint32 Member's joining timestamp
+     * @param joinDate uint64 Member's joining timestamp
      */
     function add(
         MembersBook storage self,
         address account,
-        uint32 joined
+        uint64 joinDate
     )
-        internal
-        returns (bool)
+    internal
+    returns (bool)
     {
         if (account == address(0) || contains(self, account)) {
             return false;
@@ -130,8 +161,8 @@ library MembersBookLib {
 
         self.entries.push(
             Member({
-                account: account,
-                joined: joined
+            account: account,
+            joinDate: joinDate
             }));
 
         return true;
@@ -145,8 +176,8 @@ library MembersBookLib {
         MembersBook storage self,
         address account
     )
-        internal
-        returns (bool)
+    internal
+    returns (bool)
     {
         if (!contains(self, account)) {
             return false;
@@ -171,9 +202,9 @@ library MembersBookLib {
         MembersBook storage self,
         address account
     )
-        internal
-        view
-        returns (bool)
+    internal
+    view
+    returns (bool)
     {
         for (uint256 i = 0; i < self.entries.length; i++) {
             if (self.entries[i].account == account) {
@@ -192,9 +223,9 @@ library MembersBookLib {
         MembersBook storage self,
         address account
     )
-        private
-        view
-        returns (uint256)
+    private
+    view
+    returns (uint256)
     {
         for (uint256 i = 0; i < self.entries.length; i++) {
             if (self.entries[i].account == account) {
@@ -205,6 +236,7 @@ library MembersBookLib {
     }
 }
 
+// File: contracts/PragmaticHodlings.sol
 
 /**
  * @title Token interface compatible with Pragmatic Hodlings
@@ -219,7 +251,7 @@ contract TransferableToken {
 
 /**
  * @title Proportionally distribute contract's tokens to each registered hodler
- * @dev Proportion is calculated based on joined timestamp
+ * @dev Proportion is calculated based on join date timestamp
  * @dev Group of hodlers and settlements are managed by contract owner
  * @author Wojciech Harzowski (https://github.com/harzo)
  * @author Dominik Kroliczek (https://github.com/kruligh)
@@ -259,8 +291,9 @@ contract PragmaticHodlings is Ownable {
         _;
     }
 
-    modifier onlyPast(uint32 timestamp) {
-        // solhint-disable-next-line not-rely-on-time
+    modifier onlyPast(uint64 timestamp) {
+        // solhint-disable not-rely-on-time
+        // solium-disable-next-line security/no-block-members
         require(now > timestamp);
         _;
     }
@@ -268,9 +301,9 @@ contract PragmaticHodlings is Ownable {
     /**
     * @dev New hodler has been added to book
     * @param account address Hodler's address
-    * @param joined uint32 Hodler's joining timestamp
+    * @param joinDate uint64 Hodler's joining timestamp
     */
-    event HodlerAdded(address account, uint32 joined);
+    event HodlerAdded(address account, uint64 joinDate);
 
     /**
      * @dev Existing hodler has been removed
@@ -288,17 +321,17 @@ contract PragmaticHodlings is Ownable {
     /**
      * @dev Adds new hodler to book
      * @param account address Hodler's address
-     * @param joined uint32 Hodler's joining timestamp
+     * @param joinDate uint64 Hodler's joining timestamp
      */
-    function addHodler(address account, uint32 joined)
-        public
-        onlyOwner
-        onlyValidAddress(account)
-        onlyNotExisting(account)
-        onlyPast(joined)
+    function addHodler(address account, uint64 joinDate)
+    public
+    onlyOwner
+    onlyValidAddress(account)
+    onlyNotExisting(account)
+    onlyPast(joinDate)
     {
-        hodlers.add(account, joined);
-        HodlerAdded(account, joined);
+        hodlers.add(account, joinDate);
+        emit HodlerAdded(account, joinDate);
     }
 
     /**
@@ -306,13 +339,13 @@ contract PragmaticHodlings is Ownable {
      * @param account address Hodler's address whose should be removed
      */
     function removeHodler(address account)
-        public
-        onlyOwner
-        onlyValidAddress(account)
-        onlyExisting(account)
+    public
+    onlyOwner
+    onlyValidAddress(account)
+    onlyExisting(account)
     {
         hodlers.remove(account);
-        HodlerRemoved(account);
+        emit HodlerRemoved(account);
     }
 
     /**
@@ -320,10 +353,10 @@ contract PragmaticHodlings is Ownable {
      * @param token BasicToken The token to settle
      */
     function settleToken(TransferableToken token)
-        public
-        onlyOwner
-        onlyHodlersExist
-        onlySufficientAmount(token)
+    public
+    onlyOwner
+    onlyHodlersExist
+    onlySufficientAmount(token)
     {
         uint256 tokenAmount = token.balanceOf(this);
 
@@ -333,7 +366,7 @@ contract PragmaticHodlings is Ownable {
             token.transfer(hodlers.entries[i].account, tokenShares[i]);
         }
 
-        TokenSettled(token, tokenAmount);
+        emit TokenSettled(token, tokenAmount);
     }
 
     /**
@@ -342,16 +375,16 @@ contract PragmaticHodlings is Ownable {
      * @return tokenShares uint256[] Calculated shares
      */
     function calculateShares(uint256 amount)
-        public
-        view
-        returns (uint256[])
+    public
+    view
+    returns (uint256[])
     {
         uint256[] memory temp = new uint256[](hodlers.entries.length);
 
         uint256 sum = 0;
         for (uint256 i = 0; i < temp.length; i++) {
-            // solhint-disable-next-line not-rely-on-time
-            temp[i] = now.sub(hodlers.entries[i].joined);
+            // solium-disable-next-line security/no-block-members
+            temp[i] = now.sub(hodlers.entries[i].joinDate);
             sum = sum.add(temp[i]);
         }
 
@@ -371,19 +404,19 @@ contract PragmaticHodlings is Ownable {
     /**
      * @dev Returns hodlers addresses with joining timestamps
      * @return address[] Addresses of hodlers
-     * @return uint32[] joining timestamps. Related by index with addresses
+     * @return uint64[] joining timestamps. Related by index with addresses
      */
     function getHodlers()
-        public
-        view
-        returns (address[], uint32[])
+    public
+    view
+    returns (address[], uint64[])
     {
         address[] memory hodlersAddresses = new address[](hodlers.entries.length);
-        uint32[] memory hodlersTimestamps = new uint32[](hodlers.entries.length);
+        uint64[] memory hodlersTimestamps = new uint64[](hodlers.entries.length);
 
         for (uint256 i = 0; i < hodlers.entries.length; i++) {
             hodlersAddresses[i] = hodlers.entries[i].account;
-            hodlersTimestamps[i] = hodlers.entries[i].joined;
+            hodlersTimestamps[i] = hodlers.entries[i].joinDate;
         }
 
         return (hodlersAddresses, hodlersTimestamps);
@@ -394,9 +427,9 @@ contract PragmaticHodlings is Ownable {
      * @return bool whether account is registered as holder
      */
     function isHodler(address account)
-        public
-        view
-        returns (bool)
+    public
+    view
+    returns (bool)
     {
         return hodlers.contains(account);
     }

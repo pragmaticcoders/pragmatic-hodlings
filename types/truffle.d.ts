@@ -3,6 +3,19 @@ declare module '*.json' {
   export default value;
 }
 
+declare module 'truffle-privatekey-provider' {
+  namespace PrivateKeyProvider {
+    // tslint:disable-next-line
+    export interface PrivateKeyProvider { }
+  }
+
+  class PrivateKeyProvider {
+    constructor(privateKey: string, host: string);
+  }
+
+  export = PrivateKeyProvider;
+}
+
 declare module 'truffle' {
   import { AnyNumber, TxData } from 'web3';
 
